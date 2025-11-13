@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.train_back.mapper.PortfolioHoldingMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="HoldingResultMap" type="com.example.train_back.entity.PortfolioHolding">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="portfolio_id" property="portfolioId" jdbcType="INTEGER"/>
+        <result column="fund_code" property="fundCode" jdbcType="VARCHAR"/>
+        <result column="fund_name" property="fundName" jdbcType="VARCHAR"/>
+        <result column="weight" property="weight" jdbcType="DECIMAL"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 批量插入持仓 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO portfolio_holdings (
+            portfolio_id, fund_code, fund_name, weight, remark, created_at, updated_at
+        ) VALUES
+        <foreach collection="holdings" item="item" separator=",">
+            (
+                #{item.portfolioId}, #{item.fundCode}, #{item.fundName},
+                #{item.weight}, #{item.remark}, NOW(), NOW()
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            fund_name = VALUES(fund_name),
+            weight = VALUES(weight),
+            remark = VALUES(remark),
+            updated_at = NOW()
+    </insert>
+
+    <!-- 根据组合ID查询持仓列表（关联基金表获取详细信息） -->
+    <select id="selectByPortfolioId" resultMap="HoldingResultMap">
+        SELECT 
+            h.id,
+            h.portfolio_id,
+            h.fund_code,
+            COALESCE(h.fund_name, f.fund_name) AS fund_name,
+            h.weight,
+            h.remark,
+            h.created_at,
+            h.updated_at
+        FROM portfolio_holdings h
+        LEFT JOIN funds f ON h.fund_code = f.fund_code
+        WHERE h.portfolio_id = #{portfolioId}
+        ORDER BY h.id ASC
+    </select>
+
+    <!-- 删除组合的所有持仓 -->
+    <delete id="deleteByPortfolioId">
+        DELETE FROM portfolio_holdings
+        WHERE portfolio_id = #{portfolioId}
+    </delete>
+
+    <!-- 根据持仓ID删除 -->
+    <delete id="deleteById">
+        DELETE FROM portfolio_holdings
+        WHERE id = #{id}
+    </delete>
+
+</mapper>
+

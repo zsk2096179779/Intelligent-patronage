@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.train_back.mapper.FundMapper">
+
+    <!-- 基金结果映射 -->
+    <resultMap id="FundResultMap" type="com.example.train_back.entity.Fund">
+        <id column="fund_code" property="fundCode" jdbcType="VARCHAR"/>
+        <result column="fund_name" property="fundName" jdbcType="VARCHAR"/>
+        <result column="fund_description" property="fundDescription" jdbcType="VARCHAR"/>
+        <result column="manager_id" property="managerId" jdbcType="INTEGER"/>
+        <result column="company_id" property="companyId" jdbcType="INTEGER"/>
+        <result column="fund_type" property="fundType" jdbcType="VARCHAR"/>
+        <result column="category" property="category" jdbcType="VARCHAR"/>
+        <result column="operation_cycle" property="operationCycle" jdbcType="VARCHAR"/>
+        <result column="fund_size" property="fundSize" jdbcType="DOUBLE"/>
+        <result column="inception_date" property="inceptionDate" jdbcType="DATE"/>
+        <result column="fee_rate" property="feeRate" jdbcType="DOUBLE"/>
+        <result column="stock_asset" property="stockAsset" jdbcType="DOUBLE"/>
+        <result column="cash_asset" property="cashAsset" jdbcType="DOUBLE"/>
+        <result column="bond_asset" property="bondAsset" jdbcType="DOUBLE"/>
+        <result column="deposit_asset" property="depositAsset" jdbcType="DOUBLE"/>
+        <result column="proportion" property="proportion" jdbcType="DOUBLE"/>
+    </resultMap>
+
+    <!-- 查询所有基金列表 -->
+    <select id="selectAllFunds" resultMap="FundResultMap">
+        SELECT 
+            fund_code, fund_name, fund_description, manager_id, company_id,
+            fund_type, category, operation_cycle, fund_size, inception_date,
+            fee_rate, stock_asset, cash_asset, bond_asset, deposit_asset, proportion
+        FROM funds
+        ORDER BY fund_code ASC
+    </select>
+
+    <!-- 根据基金代码查询基金信息 -->
+    <select id="selectByFundCode" resultMap="FundResultMap">
+        SELECT 
+            fund_code, fund_name, fund_description, manager_id, company_id,
+            fund_type, category, operation_cycle, fund_size, inception_date,
+            fee_rate, stock_asset, cash_asset, bond_asset, deposit_asset, proportion
+        FROM funds
+        WHERE fund_code = #{fundCode}
+    </select>
+
+    <!-- 根据基金代码列表批量查询 -->
+    <select id="selectByFundCodes" resultMap="FundResultMap">
+        SELECT 
+            fund_code, fund_name, fund_description, manager_id, company_id,
+            fund_type, category, operation_cycle, fund_size, inception_date,
+            fee_rate, stock_asset, cash_asset, bond_asset, deposit_asset, proportion
+        FROM funds
+        WHERE fund_code IN
+        <foreach collection="fundCodes" item="code" open="(" separator="," close=")">
+            #{code}
+        </foreach>
+        ORDER BY fund_code ASC
+    </select>
+
+    <!-- 搜索基金（根据代码或名称模糊查询） -->
+    <select id="searchFunds" resultMap="FundResultMap">
+        SELECT 
+            fund_code, fund_name, fund_description, manager_id, company_id,
+            fund_type, category, operation_cycle, fund_size, inception_date,
+            fee_rate, stock_asset, cash_asset, bond_asset, deposit_asset, proportion
+        FROM funds
+        WHERE fund_code LIKE CONCAT('%', #{keyword}, '%')
+           OR fund_name LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY fund_code ASC
+        LIMIT 100
+    </select>
+
+</mapper>
+

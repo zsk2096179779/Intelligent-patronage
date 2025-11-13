@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.train_back.mapper.StrategyCombinationMapper">
+
+    <!-- 组合详情结果映射（包含策略信息） -->
+    <resultMap id="PortfolioDetailResultMap" type="com.example.train_back.dto.PortfolioDetailDTO">
+        <!-- 组合信息 -->
+        <id column="portfolio_id" property="portfolioId" jdbcType="INTEGER"/>
+        <result column="portfolio_name" property="portfolioName" jdbcType="VARCHAR"/>
+        <result column="risk_level" property="riskLevel" jdbcType="VARCHAR"/>
+        <result column="portfolio_strategy_type" property="portfolioStrategyType" jdbcType="VARCHAR"/>
+        <result column="listed" property="listed" jdbcType="TINYINT"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="reject_reason" property="rejectReason" jdbcType="VARCHAR"/>
+        
+        <!-- 策略信息 -->
+        <result column="strategy_id" property="strategyId" jdbcType="INTEGER"/>
+        <result column="strategy_name" property="strategyName" jdbcType="VARCHAR"/>
+        <result column="strategy_type" property="strategyType" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="strategy_ref_id" property="strategyRefId" jdbcType="INTEGER"/>
+        <result column="created_at" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="scale" property="scale" jdbcType="DOUBLE"/>
+        <result column="funds" property="funds" jdbcType="VARCHAR"/>
+        <result column="fee_rate" property="feeRate" jdbcType="DOUBLE"/>
+        <result column="return_rate" property="returnRate" jdbcType="DOUBLE"/>
+        <result column="annual_return" property="annualReturn" jdbcType="DOUBLE"/>
+        <result column="volatility" property="volatility" jdbcType="DOUBLE"/>
+        <result column="sharpe_ratio" property="sharpeRatio" jdbcType="DOUBLE"/>
+        <result column="max_drawdown" property="maxDrawdown" jdbcType="DOUBLE"/>
+        <result column="win_rate" property="winRate" jdbcType="DOUBLE"/>
+    </resultMap>
+
+    <!-- 查询所有策略组合（包含策略信息） -->
+    <select id="selectAllPortfolioDetails" resultMap="PortfolioDetailResultMap">
+        SELECT
+            p.id AS portfolio_id,
+            p.name AS portfolio_name,
+            p.risk_level,
+            p.strategy_type AS portfolio_strategy_type,
+            p.listed,
+            p.status,
+            p.reject_reason,
+            s.strategyid AS strategy_id,
+            s.name AS strategy_name,
+            s.strategy_type,
+            s.description,
+            s.strategy_ref_id,
+            p.created_at,
+            s.scale,
+            s.funds,
+            s.fee_rate,
+            s.return_rate,
+            s.annual_return,
+            s.volatility,
+            s.sharpe_ratio,
+            s.max_drawdown,
+            s.win_rate
+        FROM portfolios p
+                 LEFT JOIN strategies s ON p.strategy_id = s.strategy_ref_id
+        ORDER BY p.id DESC
+    </select>
+
+    <!-- 审核通过：将 listed 字段从 0 更新为 1，状态更新为 approved，并清空拒绝原因 -->
+    <update id="approvePortfolio">
+        UPDATE portfolios
+        SET listed = 1,
+            status = 'approved',
+            reject_reason = NULL,
+            updated_at = NOW()
+        WHERE id = #{id} AND listed = 0
+    </update>
+
+    <!-- 审核拒绝：将 listed 字段更新为 -1，状态更新为 rejected，并记录拒绝原因 -->
+    <update id="rejectPortfolio">
+        UPDATE portfolios
+        SET listed = -1,
+            status = 'rejected',
+            reject_reason = #{reason},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 创建组合产品 -->
+    <insert id="createPortfolio" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO portfolios (name, risk_level, strategy_type, summary, target_investor, strategy_id, listed, status, created_at, updated_at)
+        VALUES (#{name}, #{riskLevel}, #{strategyType}, #{summary}, #{targetInvestor}, #{strategyId}, 0, 'draft', NOW(), NOW())
+    </insert>
+
+    <!-- 更新组合基础信息 -->
+    <update id="updatePortfolioBasicInfo">
+        UPDATE portfolios
+        SET name = #{name},
+            risk_level = #{riskLevel},
+            strategy_type = #{strategyType},
+            summary = #{summary},
+            target_investor = #{targetInvestor},
+            strategy_id = #{strategyId},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID查询组合 -->
+    <select id="selectById" resultType="com.example.train_back.entity.StrategyCombination">
+        SELECT 
+            id, name, risk_level, strategy_type, summary, target_investor,
+            strategy_id, listed, status, created_at, updated_at
+        FROM portfolios
+        WHERE id = #{id}
+    </select>
+
+    <!-- 更新组合状态 -->
+    <update id="updateStatus">
+        UPDATE portfolios
+        SET status = #{status},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
+
