@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 组合Controller（前端接口）
+ * 组合Controller（前端接口：/combos）
  */
 @RestController
 @RequestMapping("/")

@@ -17,7 +17,7 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 // 允许的源（前端地址）- Spring Boot 3.x 使用 allowedOriginPatterns
-                .allowedOriginPatterns("http://localhost:5174", "http://localhost:3000", "http://127.0.0.1:5173")
+                .allowedOriginPatterns("http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://127.0.0.1:5173")
                 // 允许的 HTTP 方法
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 // 允许的请求头
