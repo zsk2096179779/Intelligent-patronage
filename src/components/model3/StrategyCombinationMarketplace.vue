@@ -3,7 +3,10 @@
     <div class="page-header">
       <div>
         <h2 class="page-title">组合产品订购</h2>
-        <p class="page-subtitle">展示已上架的组合产品，可查看详情并进行签约订购</p>
+        <p class="page-subtitle">
+          <span v-if="canPurchase">展示已上架的组合产品，可查看详情并进行签约订购</span>
+          <span v-else>展示已上架的组合产品，可查看详情（当前角色仅可查看，无法订购）</span>
+        </p>
       </div>
       <el-input
         v-model="searchKeyword"
@@ -55,7 +58,8 @@
         <el-card shadow="hover" class="combo-card" @click="openDetail(item)">
           <div class="card-header">
             <h3 class="combo-name">{{ item.portfolioName }}</h3>
-            <el-tag type="success" round>可订购</el-tag>
+            <el-tag v-if="canPurchase" type="success" round>可订购</el-tag>
+            <el-tag v-else type="info" round>仅查看</el-tag>
           </div>
           <div class="card-section">
             <div class="section-title">基础信息</div>
@@ -173,12 +177,18 @@
             :image-size="80"
           />
 
-          <div class="subscribe-panel">
+          <div v-if="canPurchase" class="subscribe-panel">
             <div>
               <h4 class="section-header">签约订购</h4>
               <p class="subscribe-tip">签约前请仔细阅读组合详情并确认风险承受能力。</p>
             </div>
             <el-button type="success" size="large" @click="openSubscribeDialog">签约订购</el-button>
+          </div>
+          <div v-else class="subscribe-panel view-only">
+            <div>
+              <h4 class="section-header">查看模式</h4>
+              <p class="subscribe-tip">当前角色仅可查看组合产品信息，无法进行订购操作。</p>
+            </div>
           </div>
         </div>
       </template>
@@ -226,6 +236,7 @@ import axios from 'axios'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { getApiUrl, API_CONFIG } from '../../config/api'
+import { useAuthStore } from '@/stores/auth'
 
 interface CombinationItem {
   portfolioId: number
@@ -257,6 +268,13 @@ interface HoldingItem {
   weight: number
   remark?: string
 }
+
+const authStore = useAuthStore()
+
+// 判断当前用户是否可以购买（只有普通用户可以购买）
+const canPurchase = computed(() => {
+  return authStore.userInfo?.role === 'USER'
+})
 
 const loading = ref(false)
 const tableData = ref<CombinationItem[]>([])
@@ -614,6 +632,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.subscribe-panel.view-only {
+  background: #f5f7fa;
+  justify-content: flex-start;
 }
 
 .subscribe-tip {

@@ -7,6 +7,12 @@ export const API_CONFIG = {
   
   // API 端点
   ENDPOINTS: {
+    // 认证相关接口
+    AUTH_LOGIN: '/api/auth/login',
+    AUTH_REGISTER: '/api/auth/register',
+    AUTH_LOGOUT: '/api/auth/logout',
+    AUTH_USER: '/api/auth/user',
+    AUTH_CHECK_USERNAME: '/api/auth/check-username',
     // 策略组合（获取全部）- 根据后端接口文档
     STRATEGY_COMBINATION_ALL: '/combos',
     // 创建策略组合
