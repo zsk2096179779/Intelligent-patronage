@@ -16,7 +16,6 @@ public interface RiskAssessmentService {
 
     RiskAssessmentSubmitResp submitAssessment(Integer userId, RiskAssessmentSubmitReq req);
 
-    // 你之前已经有的：
     RiskStatusResp getRiskStatus(Integer userId);
 
     RiskMatchCheckResp checkRiskMatch(Integer userId, RiskMatchCheckReq req);
