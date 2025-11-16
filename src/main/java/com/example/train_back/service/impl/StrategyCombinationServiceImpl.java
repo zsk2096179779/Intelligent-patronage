@@ -35,7 +35,7 @@ public class StrategyCombinationServiceImpl implements StrategyCombinationServic
     @Override
     @Transactional
     public boolean rejectPortfolio(Integer id, String reason) {
-        // 更新 listed 字段为 -1，并记录拒绝原因到 reject_reason 字段
+        // 更新 listed 字段为 -签约业务模块设计.md，并记录拒绝原因到 reject_reason 字段
         int rows = strategyCombinationMapper.rejectPortfolio(id, reason);
         return rows > 0;
     }

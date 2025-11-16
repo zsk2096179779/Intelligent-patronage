@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.train_back.mapper.InvestorProfileMapper">
+
+    <resultMap id="InvestorProfileMap"
+               type="com.example.train_back.entity.InvestorProfile">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="otc_account_no" property="otcAccountNo"/>
+        <result column="otc_status" property="otcStatus"/>
+        <result column="otc_open_date" property="otcOpenDate"/>
+
+        <result column="real_name" property="realName"/>
+        <result column="id_card_no" property="idCardNo"/>
+        <result column="mobile" property="mobile"/>
+        <result column="bank_card_no" property="bankCardNo"/>
+        <result column="bank_name" property="bankName"/>
+
+        <result column="risk_level" property="riskLevel"/>
+        <result column="risk_score" property="riskScore"/>
+        <result column="risk_assessment_date" property="riskAssessmentDate"/>
+        <result column="risk_expire_date" property="riskExpireDate"/>
+
+        <result column="annual_income_range" property="annualIncomeRange"/>
+        <result column="total_asset_range" property="totalAssetRange"/>
+        <result column="investment_experience" property="investmentExperience"/>
+
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <select id="selectByUserId"
+            parameterType="int"
+            resultMap="InvestorProfileMap">
+        SELECT
+            id,
+            user_id,
+            otc_account_no,
+            otc_status,
+            otc_open_date,
+            real_name,
+            id_card_no,
+            mobile,
+            bank_card_no,
+            bank_name,
+            risk_level,
+            risk_score,
+            risk_assessment_date,
+            risk_expire_date,
+            annual_income_range,
+            total_asset_range,
+            investment_experience,
+            status,
+            created_at,
+            updated_at
+        FROM investor_profile
+        WHERE user_id = #{userId}
+          AND status = 1
+            LIMIT 1
+    </select>
+
+    <insert id="insert"
+            parameterType="com.example.train_back.entity.InvestorProfile"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO investor_profile (
+            user_id,
+            real_name,
+            id_card_no,
+            mobile,
+            bank_card_no,
+            bank_name,
+            otc_status,
+            otc_account_no,
+            otc_open_date,
+            status,
+            created_at,
+            updated_at
+        ) VALUES (
+                     #{userId},
+                     #{realName},
+                     #{idCardNo},
+                     #{mobile},
+                     #{bankCardNo},
+                     #{bankName},
+                     #{otcStatus},
+                     #{otcAccountNo},
+                     #{otcOpenDate},
+                     #{status},
+                     NOW(),
+                     NOW()
+                 )
+    </insert>
+
+    <update id="updateOtcInfoByUserId"
+            parameterType="com.example.train_back.entity.InvestorProfile">
+        UPDATE investor_profile
+        SET real_name      = #{realName},
+            id_card_no     = #{idCardNo},
+            mobile         = #{mobile},
+            bank_card_no   = #{bankCardNo},
+            bank_name      = #{bankName},
+            otc_status     = #{otcStatus},
+            otc_account_no = #{otcAccountNo},
+            otc_open_date  = #{otcOpenDate},
+            updated_at     = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateRiskInfoByUserId"
+            parameterType="com.example.train_back.entity.InvestorProfile">
+        UPDATE investor_profile
+        SET risk_level          = #{riskLevel},
+            risk_score          = #{riskScore},
+            risk_assessment_date = #{riskAssessmentDate},
+            risk_expire_date     = #{riskExpireDate},
+            updated_at          = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

@@ -246,7 +246,7 @@ public class StrategyCombinationController {
             // 验证权重总和
             if (!holdingService.validateWeightSum(holdings)) {
                 response.put("code", 400);
-                response.put("message", "保存失败：持仓权重总和必须为100%（或 1.0）");
+                response.put("message", "保存失败：持仓权重总和必须为100%（或 签约业务模块设计.md.0）");
                 response.put("data", null);
                 return ResponseEntity.badRequest().body(response);
             }

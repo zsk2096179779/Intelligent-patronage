@@ -3,7 +3,7 @@
 -- 执行顺序：先确认 portfolios 表已存在，再运行本脚本
 -- ============================================================
 
--- 1. 扩展 portfolios 表，支持组合创建流程的额外字段
+-- 签约业务模块设计.md. 扩展 portfolios 表，支持组合创建流程的额外字段
 ALTER TABLE portfolios
     ADD COLUMN IF NOT EXISTS summary TEXT NULL COMMENT '组合简介/亮点' AFTER strategy_type,
     ADD COLUMN IF NOT EXISTS target_investor VARCHAR(200) NULL COMMENT '目标客户/适用人群' AFTER summary,
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS portfolio_strategy_params (
     volatility_limit DECIMAL(6,4) NULL COMMENT '波动率限制 (%)',
     position_limit DECIMAL(6,4) NULL COMMENT '仓位上限 (%)',
     cash_min_ratio DECIMAL(6,4) NULL COMMENT '现金最小占比 (%)',
-    leverage_allowed TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否允许杠杆 1-是 0-否',
+    leverage_allowed TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否允许杠杆 签约业务模块设计.md-是 0-否',
     stop_loss_limit DECIMAL(6,4) NULL COMMENT '止损阈值 (%)',
     additional_constraints JSON NULL COMMENT '其他策略/风控约束 (JSON)',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

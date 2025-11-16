@@ -561,7 +561,7 @@ curl -X POST http://localhost:8080/api/strategy-combination/1/reject \
 ```json
 {
   "code": 400,
-  "message": "保存失败：持仓权重总和必须为100%（或 1.0）",
+  "message": "保存失败：持仓权重总和必须为100%（或 签约业务模块设计.md.0）",
   "data": null
 }
 ```

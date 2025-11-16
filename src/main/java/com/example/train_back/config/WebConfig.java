@@ -22,7 +22,12 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/api/auth/login",      // 排除登录接口
                         "/api/auth/register",  // 排除注册接口
-                        "/api/auth/check-username" // 排除检查用户名接口
+                        "/api/auth/check-username",// 排除检查用户名接口
+                        "/api/investor/otc/status",
+                        "/api/investor/otc/open",
+                        "/api/investor/profile",
+                        "/api/risk-assessment/status",
+                        "/api/risk-assessment/match-check"
                 );
     }
 }

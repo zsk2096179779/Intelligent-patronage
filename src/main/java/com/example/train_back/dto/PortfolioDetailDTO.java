@@ -27,7 +27,7 @@ public class PortfolioDetailDTO {
     private String portfolioStrategyType;
     
     /**
-     * 是否上架（0-未上架/未审核，1-已上架/已审核，-1-已拒绝）
+     * 是否上架（0-未上架/未审核，签约业务模块设计.md-已上架/已审核，-签约业务模块设计.md-已拒绝）
      */
     private Integer listed;
     

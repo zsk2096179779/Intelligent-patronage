@@ -37,7 +37,7 @@ public class User {
     private String role;
     
     /**
-     * 状态：1-正常，0-禁用
+     * 状态：签约业务模块设计.md-正常，0-禁用
      */
     private Integer status;
     

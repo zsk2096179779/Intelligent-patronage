@@ -60,7 +60,7 @@ public class PortfolioHoldingServiceImpl implements PortfolioHoldingService {
             holding.setPortfolioId(portfolioId);
             BeanUtils.copyProperties(dto, holding);
             
-            // 统一转换权重：兼容 0-1 与 0-100 的传入格式
+            // 统一转换权重：兼容 0-签约业务模块设计.md 与 0-100 的传入格式
             BigDecimal normalizedWeight = normalizeWeight(dto.getWeight());
             holding.setWeight(normalizedWeight.setScale(6, RoundingMode.HALF_UP));
             

@@ -20,14 +20,14 @@ public interface StrategyCombinationMapper {
     List<PortfolioDetailDTO> selectAllPortfolioDetails();
     
     /**
-     * 审核通过：将 listed 字段从 0 更新为 1
+     * 审核通过：将 listed 字段从 0 更新为 签约业务模块设计.md
      * @param id 组合ID
      * @return 更新的行数
      */
     int approvePortfolio(@Param("id") Integer id);
     
     /**
-     * 审核拒绝：将 listed 字段更新为 -1，并记录拒绝原因
+     * 审核拒绝：将 listed 字段更新为 -签约业务模块设计.md，并记录拒绝原因
      * @param id 组合ID
      * @param reason 拒绝原因
      * @return 更新的行数
