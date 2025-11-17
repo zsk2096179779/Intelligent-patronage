@@ -58,7 +58,7 @@ public class RiskAssessmentController {
     public ApiResponse<RiskAssessmentSubmitResp> submitAssessment(
             @RequestBody RiskAssessmentSubmitReq req) {
 
-        Integer userId = 19;  // TODO: 从登录态获取
+        Integer userId = 19;  // TODO: 从登录态获取真实userid
         RiskAssessmentSubmitResp data = riskAssessmentService.submitAssessment(userId, req);
         return ApiResponse.success(data);
     }
