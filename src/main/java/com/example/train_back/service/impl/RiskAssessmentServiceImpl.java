@@ -96,40 +96,16 @@ public class RiskAssessmentServiceImpl implements RiskAssessmentService {
         // 版本号先写死为 1.0，后续可以从问卷表动态获取
         String questionnaireVersion = "1.0";
 
-        RiskAssessmentRecord record = new RiskAssessmentRecord();
-        record.setUserId(userId);
-        record.setAssessmentNo(generateAssessmentNo(userId));
-        record.setQuestionnaireVersion(questionnaireVersion);
-        record.setAnswers(null);
-        record.setTotalScore(0);
-        record.setRiskLevel(null);
-        record.setIpAddress(null);     // 如需记录，可以从 request 里取
-        record.setDeviceInfo(null);    // 如需记录，可以从 UA 里取
-        record.setStartedAt(LocalDateTime.now());
-        record.setCompletedAt(null);
-        record.setExpireAt(null);
-        record.setIsCompleted(0);
-        record.setIsCurrent(0);
-
-        riskAssessmentRecordMapper.insert(record);
-
         RiskAssessmentStartResp resp = new RiskAssessmentStartResp();
-        resp.setAssessmentNo(record.getAssessmentNo());
+        resp.setAssessmentNo(generateAssessmentNo(userId));
         resp.setQuestionnaireVersion(questionnaireVersion);
-        resp.setStartedAt(record.getStartedAt());
+        resp.setStartedAt(LocalDateTime.now());
         return resp;
     }
 
     @Override
     public RiskAssessmentSubmitResp submitAssessment(Integer userId, RiskAssessmentSubmitReq req) {
-        // 1) 校验测评记录是否存在
-        RiskAssessmentRecord startRecord = riskAssessmentRecordMapper
-                .selectByAssessmentNoAndUserId(req.getAssessmentNo(), userId);
-        if (startRecord == null) {
-            throw new RuntimeException("测评记录不存在，请先开始测评");
-        }
-
-        // 2) 计算总分
+        // 1) 计算总分
         int totalScore = 0;
         if (req.getAnswers() != null) {
             for (RiskAssessmentSubmitReq.AnswerItem a : req.getAnswers()) {
@@ -139,39 +115,42 @@ public class RiskAssessmentServiceImpl implements RiskAssessmentService {
             }
         }
 
-        // 3) 得到风险等级映射（C1~C5 + 文案）
+        // 2) 得到风险等级
         RiskLevelResult risk = calcRiskLevel(totalScore);
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expireAt = now.plusYears(1);
 
-        // 4) 按“结果记录”的形式再插一条，当做当前测评结果
+        // 3) 序列化答案
+        String answersJson;
+        try {
+            answersJson = objectMapper.writeValueAsString(req.getAnswers());
+        } catch (JsonProcessingException e) {
+            answersJson = "[]"; // 兜底，避免 NOT NULL 再炸
+        }
+
+        // 4) 先把之前的 current 清掉
+        riskAssessmentRecordMapper.clearCurrentByUserId(userId);
+
+        // 5) 直接插入一条完整记录
         RiskAssessmentRecord record = new RiskAssessmentRecord();
         record.setUserId(userId);
-        record.setAssessmentNo(startRecord.getAssessmentNo());
-        record.setQuestionnaireVersion(startRecord.getQuestionnaireVersion());
+        record.setAssessmentNo(req.getAssessmentNo());
+        record.setQuestionnaireVersion("1.0");
+        record.setAnswers(answersJson);
         record.setTotalScore(totalScore);
         record.setRiskLevel(risk.code);
-        record.setIpAddress(startRecord.getIpAddress());
-        record.setDeviceInfo(startRecord.getDeviceInfo());
-        record.setStartedAt(startRecord.getStartedAt());
+        record.setIpAddress(null);    // 如需要可从 request 获取
+        record.setDeviceInfo(null);
+        record.setStartedAt(now);     // 简单起见：start = completed = now
         record.setCompletedAt(now);
         record.setExpireAt(expireAt);
         record.setIsCompleted(1);
         record.setIsCurrent(1);
 
-        try {
-            String answersJson = objectMapper.writeValueAsString(req.getAnswers());
-            record.setAnswers(answersJson);
-        } catch (JsonProcessingException e) {
-            record.setAnswers(null);
-        }
-
-        // 5) 清掉当前用户之前的“当前记录”，再插入一条新的 current 记录
-        riskAssessmentRecordMapper.clearCurrentByUserId(userId);
         riskAssessmentRecordMapper.insert(record);
 
-        // 6) 回写投资者画像 investor_profile 表
+        // 6) 回写投资者画像 investor_profile
         InvestorProfile profile = investorProfileMapper.selectByUserId(userId);
         if (profile == null) {
             profile = new InvestorProfile();
@@ -188,7 +167,7 @@ public class RiskAssessmentServiceImpl implements RiskAssessmentService {
             investorProfileMapper.updateRiskInfoByUserId(profile);
         }
 
-        // 7) 构造返回
+        // 7) 返回结果给前端
         RiskAssessmentSubmitResp resp = new RiskAssessmentSubmitResp();
         resp.setAssessmentNo(record.getAssessmentNo());
         resp.setTotalScore(totalScore);

@@ -119,4 +119,23 @@
             LIMIT 1
     </select>
 
+    <update id="updateById"
+            parameterType="com.example.train_back.entity.RiskAssessmentRecord">
+        UPDATE risk_assessment_record
+        SET
+            questionnaire_version = #{questionnaireVersion},
+            answers               = #{answers},
+            total_score           = #{totalScore},
+            risk_level            = #{riskLevel},
+            ip_address            = #{ipAddress},
+            device_info           = #{deviceInfo},
+            started_at            = #{startedAt},
+            completed_at          = #{completedAt},
+            expire_at             = #{expireAt},
+            is_completed          = #{isCompleted},
+            is_current            = #{isCurrent},
+            updated_at            = NOW()
+        WHERE id = #{id}
+    </update>
+
 </mapper>

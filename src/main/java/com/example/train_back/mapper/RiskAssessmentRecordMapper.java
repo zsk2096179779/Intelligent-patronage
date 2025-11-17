@@ -15,4 +15,5 @@ public interface RiskAssessmentRecordMapper {
     int clearCurrentByUserId(@Param("userId") Integer userId);
 
     RiskAssessmentRecord selectCurrentByUserId(Integer userId);
+
 }

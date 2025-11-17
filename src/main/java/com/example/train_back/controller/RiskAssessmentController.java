@@ -46,7 +46,7 @@ public class RiskAssessmentController {
     @PostMapping("/start")
     public ApiResponse<RiskAssessmentStartResp> startAssessment() {
         // TODO: 从登录态获取 userId，这里先写死便于联调
-        Integer userId = 3;
+        Integer userId = 19;
         RiskAssessmentStartResp data = riskAssessmentService.startAssessment(userId);
         return ApiResponse.success(data);
     }
@@ -58,7 +58,7 @@ public class RiskAssessmentController {
     public ApiResponse<RiskAssessmentSubmitResp> submitAssessment(
             @RequestBody RiskAssessmentSubmitReq req) {
 
-        Integer userId = 3;  // TODO: 从登录态获取
+        Integer userId = 19;  // TODO: 从登录态获取
         RiskAssessmentSubmitResp data = riskAssessmentService.submitAssessment(userId, req);
         return ApiResponse.success(data);
     }

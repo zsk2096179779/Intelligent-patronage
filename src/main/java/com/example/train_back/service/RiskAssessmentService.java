@@ -8,6 +8,7 @@ import com.example.train_back.dto.RiskStatusResp;
 import com.example.train_back.dto.RiskMatchCheckReq;
 import com.example.train_back.dto.RiskMatchCheckResp;
 
+
 public interface RiskAssessmentService {
 
     RiskQuestionnaireResp getQuestionnaire(String version);
@@ -19,4 +20,5 @@ public interface RiskAssessmentService {
     RiskStatusResp getRiskStatus(Integer userId);
 
     RiskMatchCheckResp checkRiskMatch(Integer userId, RiskMatchCheckReq req);
+
 }
