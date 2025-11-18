@@ -54,7 +54,8 @@ public interface StrategyCombinationMapper {
      * @return 组合对象
      */
     StrategyCombination selectById(@Param("id") Integer id);
-    
+
+    StrategyCombination selectByIdForDeal(@Param("id") Integer id);
     /**
      * 更新组合状态
      * @param id 组合ID

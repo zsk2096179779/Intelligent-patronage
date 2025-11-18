@@ -70,7 +70,7 @@ public class AgreementController {
     public ApiResponse<AgreementSignBatchResultVO> signAgreementBatch(@RequestBody AgreementSignBatchRequest requestBody,
                                                                       HttpServletRequest request) {
 
-        log.info("[Agreement] sign-batch 入参: {}", requestBody);
+//        log.info("[Agreement] sign-batch 入参: {}", requestBody);
 
         Integer userId = getCurrentUserIdOrThrow(request);
 //        Integer userId = 19;

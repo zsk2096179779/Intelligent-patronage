@@ -109,6 +109,30 @@
         WHERE id = #{id}
     </select>
 
+    <!-- 根据ID查询组合(需要更详细的组合信息) -->
+    <select id="selectByIdForDeal"
+            parameterType="int"
+            resultType="com.example.train_back.entity.StrategyCombination">
+        SELECT
+            p.id              AS id,
+            p.name            AS name,
+            p.risk_level      AS riskLevel,
+            p.strategy_type   AS strategyType,
+            p.summary         AS summary,
+            p.target_investor AS targetInvestor,
+            p.strategy_id     AS strategyId,
+            p.listed          AS listed,
+            p.status          AS status,
+            p.created_at      AS createdAt,
+            p.updated_at      AS updatedAt,
+            s.fee_rate        AS feerate
+        FROM portfolios p
+                 LEFT JOIN strategies s
+                           ON p.strategy_id = s.strategy_ref_id
+        WHERE p.id = #{id}
+    </select>
+
+
     <!-- 更新组合状态 -->
     <update id="updateStatus">
         UPDATE portfolios

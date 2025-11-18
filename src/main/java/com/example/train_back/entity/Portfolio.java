@@ -1,5 +1,7 @@
 package com.example.train_back.entity;
 
+import java.math.BigDecimal;
+
 public class Portfolio {
 
     private Integer id;
@@ -56,4 +58,6 @@ public class Portfolio {
     public void setListed(Integer listed) {
         this.listed = listed;
     }
+
+
 }

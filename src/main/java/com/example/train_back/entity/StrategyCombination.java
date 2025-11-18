@@ -1,10 +1,16 @@
 package com.example.train_back.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * 策略组合实体类
  */
+@Setter
+@Getter
 public class StrategyCombination {
     /**
      * 组合ID（主键，自增）
@@ -61,95 +67,9 @@ public class StrategyCombination {
      */
     private LocalDateTime updatedAt;
 
+    private BigDecimal feeRate;
+
     public StrategyCombination() {
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getRiskLevel() {
-        return riskLevel;
-    }
-
-    public void setRiskLevel(String riskLevel) {
-        this.riskLevel = riskLevel;
-    }
-
-    public String getStrategyType() {
-        return strategyType;
-    }
-
-    public void setStrategyType(String strategyType) {
-        this.strategyType = strategyType;
-    }
-
-    public Integer getStrategyId() {
-        return strategyId;
-    }
-
-    public void setStrategyId(Integer strategyId) {
-        this.strategyId = strategyId;
-    }
-
-    public Integer getListed() {
-        return listed;
-    }
-
-    public void setListed(Integer listed) {
-        this.listed = listed;
-    }
-
-    public String getSummary() {
-        return summary;
-    }
-
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-
-    public String getTargetInvestor() {
-        return targetInvestor;
-    }
-
-    public void setTargetInvestor(String targetInvestor) {
-        this.targetInvestor = targetInvestor;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     @Override
@@ -163,5 +83,7 @@ public class StrategyCombination {
                 ", listed=" + listed +
                 '}';
     }
+
+
 }
 

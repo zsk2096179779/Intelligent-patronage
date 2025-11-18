@@ -18,6 +18,8 @@ public class AgreementSignBatchRequest {
     }
 
     private List<AgreementItem> agreements;
+    private List<Integer> agreementIds;
+
     private String scenario;
     private String relatedOrderNo;
 

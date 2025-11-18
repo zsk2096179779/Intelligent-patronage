@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.train_back.mapper.TradeOrderMapper">
+
+    <resultMap id="TradeOrderMap"
+               type="com.example.train_back.entity.TradeOrder">
+        <id     property="tradeId"       column="tradeid"/>
+        <result property="customerId"    column="customer_id"/>
+        <result property="fundCode"      column="fund_code"/>
+        <result property="portfolioId"   column="portfolio_id"/>
+        <result property="rebalanceId"   column="rebalance_id"/>
+        <result property="amount"        column="amount"/>
+        <result property="shares"        column="shares"/>
+        <result property="tradeType"     column="trade_type"/>
+        <result property="reason"        column="reason"/>
+        <result property="tradeTime"     column="trade_time"/>
+        <result property="status"        column="status"/>
+        <result property="failReason"    column="fail_reason"/>
+        <result property="replaceOrderId" column="replace_order_id"/>
+    </resultMap>
+
+    <insert id="insert"
+            parameterType="com.example.train_back.entity.TradeOrder"
+            useGeneratedKeys="true" keyProperty="tradeId">
+        INSERT INTO trade_orders (
+            customer_id,
+            fund_code,
+            portfolio_id,
+            rebalance_id,
+            amount,
+            shares,
+            trade_type,
+            reason,
+            trade_time,
+            status,
+            fail_reason,
+            replace_order_id
+        ) VALUES (
+                     #{customerId},
+                     #{fundCode},
+                     #{portfolioId},
+                     #{rebalanceId},
+                     #{amount},
+                     #{shares},
+                     #{tradeType},
+                     #{reason},
+                     #{tradeTime},
+                     #{status},
+                     #{failReason},
+                     #{replaceOrderId}
+                 )
+    </insert>
+
+    <insert id="insertBatch">
+        INSERT INTO trade_orders (
+        customer_id,
+        fund_code,
+        portfolio_id,
+        rebalance_id,
+        amount,
+        shares,
+        trade_type,
+        reason,
+        trade_time,
+        status,
+        fail_reason,
+        replace_order_id
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.customerId},
+            #{item.fundCode},
+            #{item.portfolioId},
+            #{item.rebalanceId},
+            #{item.amount},
+            #{item.shares},
+            #{item.tradeType},
+            #{item.reason},
+            #{item.tradeTime},
+            #{item.status},
+            #{item.failReason},
+            #{item.replaceOrderId}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectById"
+            parameterType="int"
+            resultMap="TradeOrderMap">
+        SELECT *
+        FROM trade_orders
+        WHERE tradeid = #{tradeId}
+    </select>
+
+    <select id="selectByCustomer"
+            parameterType="int"
+            resultMap="TradeOrderMap">
+        SELECT *
+        FROM trade_orders
+        WHERE customer_id = #{customerId}
+        ORDER BY trade_time DESC
+    </select>
+
+    <select id="selectByPortfolio"
+            parameterType="int"
+            resultMap="TradeOrderMap">
+        SELECT *
+        FROM trade_orders
+        WHERE portfolio_id = #{portfolioId}
+        ORDER BY trade_time DESC
+    </select>
+
+</mapper>
