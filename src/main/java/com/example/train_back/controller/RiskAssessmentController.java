@@ -16,7 +16,7 @@ public class RiskAssessmentController {
     @GetMapping("/status")
     public ApiResponse<RiskStatusResp> status() {
         // TODO: userId 先写死，后面接入登录后再改
-        Integer userId = 19;
+        Integer userId = 16;
 
         RiskStatusResp data = riskAssessmentService.getRiskStatus(userId);
         return ApiResponse.success(data);
@@ -24,7 +24,7 @@ public class RiskAssessmentController {
 
     @PostMapping("/match-check")
     public ApiResponse<RiskMatchCheckResp> matchCheck(@RequestBody RiskMatchCheckReq req) {
-        Integer userId = 19; // TODO: 同上
+        Integer userId = 16; // TODO: 同上
         RiskMatchCheckResp data = riskAssessmentService.checkRiskMatch(userId, req);
         return ApiResponse.success(data);
     }
@@ -46,7 +46,7 @@ public class RiskAssessmentController {
     @PostMapping("/start")
     public ApiResponse<RiskAssessmentStartResp> startAssessment() {
         // TODO: 从登录态获取 userId，这里先写死便于联调
-        Integer userId = 19;
+        Integer userId = 16;
         RiskAssessmentStartResp data = riskAssessmentService.startAssessment(userId);
         return ApiResponse.success(data);
     }
@@ -58,7 +58,7 @@ public class RiskAssessmentController {
     public ApiResponse<RiskAssessmentSubmitResp> submitAssessment(
             @RequestBody RiskAssessmentSubmitReq req) {
 
-        Integer userId = 19;  // TODO: 从登录态获取真实userid
+        Integer userId = 16;  // TODO: 从登录态获取真实userid
         RiskAssessmentSubmitResp data = riskAssessmentService.submitAssessment(userId, req);
         return ApiResponse.success(data);
     }

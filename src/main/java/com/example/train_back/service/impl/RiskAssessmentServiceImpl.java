@@ -261,11 +261,13 @@ public class RiskAssessmentServiceImpl implements RiskAssessmentService {
 
         // 规则：用户风险数值 >= 产品风险数值 → 匹配
         if (userRiskNum >= productRiskNum) {
+            // 匹配：可以直接购买，无需额外确认
             resp.setMatched(true);
             resp.setCanPurchase(true);
             resp.setNeedConfirm(false);
             resp.setWarningMessage(null);
         } else {
+            // 不匹配：当前不允许直接购买，但可以通过签《风险不匹配确认书》继续
             resp.setMatched(false);
             resp.setCanPurchase(false);
             resp.setNeedConfirm(true);

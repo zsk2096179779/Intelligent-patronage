@@ -19,7 +19,7 @@ public class InvestorController {
     @GetMapping("/otc/status")
     public ApiResponse<OtcStatusResponse> getOtcStatus() {
         // TODO: 这里先写死一个用户ID，后续用登录信息替换
-        Integer userId = 19;
+        Integer userId = 16;
 
         OtcStatusResponse data = investorService.getOtcStatus(userId);
         return ApiResponse.success(data);
@@ -27,14 +27,14 @@ public class InvestorController {
 
     @GetMapping("/profile")
     public ApiResponse<InvestorProfileResp> getProfile() {
-        Integer userId = 19; // TODO: 同上，替换成真实登录用户ID
+        Integer userId = 16; // TODO: 同上，替换成真实登录用户ID
         InvestorProfileResp data = investorService.getInvestorProfile(userId);
         return ApiResponse.success(data);
     }
 
     @PostMapping("/otc/open")
     public ApiResponse<Void> openOtc(@RequestBody OtcOpenReq req) {
-        Integer userId = 19; // TODO: 从登录态拿
+        Integer userId = 16; // TODO: 从登录态拿
         investorService.openOtcAccount(userId, req);
         return ApiResponse.success(null);
     }
