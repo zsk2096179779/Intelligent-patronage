@@ -334,4 +334,12 @@
         LIMIT #{offset}, #{limit}
     </select>
 
+    <select id="countActiveByUserAndPortfolio" resultType="int">
+        SELECT COUNT(1)
+        FROM subscription_order
+        WHERE user_id = #{userId}
+          AND portfolio_id = #{portfolioId}
+          AND (order_status IS NULL OR order_status != 'cancelled')
+    </select>
+
 </mapper>

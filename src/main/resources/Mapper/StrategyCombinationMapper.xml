@@ -61,6 +61,36 @@
         ORDER BY p.id DESC
     </select>
 
+    <!-- 根据组合ID查询组合详情（包含策略信息） -->
+    <select id="selectPortfolioDetailById" resultMap="PortfolioDetailResultMap">
+        SELECT
+            p.id AS portfolio_id,
+            p.name AS portfolio_name,
+            p.risk_level,
+            p.strategy_type AS portfolio_strategy_type,
+            p.listed,
+            p.status,
+            p.reject_reason,
+            s.strategyid AS strategy_id,
+            s.name AS strategy_name,
+            s.strategy_type,
+            s.description,
+            s.strategy_ref_id,
+            p.created_at,
+            s.scale,
+            s.funds,
+            s.fee_rate,
+            s.return_rate,
+            s.annual_return,
+            s.volatility,
+            s.sharpe_ratio,
+            s.max_drawdown,
+            s.win_rate
+        FROM portfolios p
+                 LEFT JOIN strategies s ON p.strategy_id = s.strategy_ref_id
+        WHERE p.id = #{portfolioId}
+    </select>
+
     <!-- 审核通过：将 listed 字段从 0 更新为 签约业务模块设计.md，状态更新为 approved，并清空拒绝原因 -->
     <update id="approvePortfolio">
         UPDATE portfolios

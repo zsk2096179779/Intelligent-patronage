@@ -20,6 +20,13 @@ public interface StrategyCombinationMapper {
     List<PortfolioDetailDTO> selectAllPortfolioDetails();
     
     /**
+     * 根据组合ID查询组合详情（包含策略信息）
+     * @param portfolioId 组合ID
+     * @return 组合详情
+     */
+    PortfolioDetailDTO selectPortfolioDetailById(@Param("portfolioId") Integer portfolioId);
+    
+    /**
      * 审核通过：将 listed 字段从 0 更新为 签约业务模块设计.md
      * @param id 组合ID
      * @return 更新的行数

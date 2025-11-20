@@ -23,4 +23,7 @@ public interface SubscriptionOrderMapper {
                                                       @Param("status") String status,
                                                       @Param("offset") int offset,
                                                       @Param("limit") int limit);
+
+    int countActiveByUserAndPortfolio(@Param("userId") Integer userId,
+                                      @Param("portfolioId") Integer portfolioId);
 }

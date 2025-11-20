@@ -2,11 +2,12 @@ package com.example.train_back.controller;
 
 import com.example.train_back.dto.ApiResponse;
 import com.example.train_back.dto.subscription.*;
-import com.example.train_back.entity.SubscriptionOrder;
 import com.example.train_back.service.SubscriptionService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -17,18 +18,6 @@ public class SubscriptionController {
 
     public SubscriptionController(SubscriptionService subscriptionService) {
         this.subscriptionService = subscriptionService;
-    }
-
-    /**
-     * 4.5.1 创建签约订单（草稿）
-     * POST /api/subscription/create
-     */
-    @PostMapping("/create")
-    public ApiResponse<SubscriptionCreateResp> createOrder(@RequestBody SubscriptionCreateReq req,
-                                                           HttpServletRequest request) {
-        Integer userId = getCurrentUserIdOrThrow(request);
-        SubscriptionCreateResp resp = subscriptionService.createOrder(userId, req);
-        return ApiResponse.success(resp);
     }
 
     /**
@@ -70,20 +59,29 @@ public class SubscriptionController {
     }
 
     /**
-     * 4.5.5 提交订单（进入审核流程）
-     * POST /api/subscription/submit/{orderNo}
+     * 4.5.5 创建并提交订单
+     * POST /api/subscription/submit
      */
-    @PostMapping("/submit/{orderNo}")
-    public ApiResponse<SubscriptionSubmitResp> submitOrder(@PathVariable("orderNo") String orderNo,
-                                                           @RequestBody SubscriptionSubmitReq req,
+    @PostMapping("/submit")
+    public ApiResponse<SubscriptionSubmitResp> submitOrder(@RequestBody SubscriptionSubmitReq req,
                                                            HttpServletRequest request) {
         Integer userId = getCurrentUserIdOrThrow(request);
-        SubscriptionSubmitResp resp = subscriptionService.submitOrder(userId, orderNo, req);
-        log.info("[Subscription] submitOrder risk check orderNo={}, riskMismatchConfirmed={}",
-                orderNo,
-                req.getRiskMismatchConfirmed());
+        SubscriptionSubmitResp resp = subscriptionService.submitOrder(userId, req);
+        log.info("[Subscription] submitOrder riskMismatchConfirmed={}", req.getRiskMismatchConfirmed());
 
         return ApiResponse.success(resp);
+    }
+
+    /**
+     * 4.5.x 检查某组合是否已订购
+     * GET /api/subscription/check-purchased?portfolioId=xxx
+     */
+    @GetMapping("/check-purchased")
+    public ApiResponse<Map<String, Object>> checkPurchased(@RequestParam("portfolioId") Integer portfolioId,
+                                                           HttpServletRequest request) {
+        Integer userId = getCurrentUserIdOrThrow(request);
+        boolean purchased = subscriptionService.hasPurchasedPortfolio(userId, portfolioId);
+        return ApiResponse.success(Map.of("purchased", purchased));
     }
 
     /**
@@ -132,6 +130,17 @@ public class SubscriptionController {
         Integer userId = getCurrentUserIdOrThrow(request);
         SubscriptionOrderPageVO pageVO = subscriptionService.listMyOrders(userId, status, page, pageSize);
         return ApiResponse.success(pageVO);
+    }
+
+    /**
+     * 4.5.9 查询已购买的组合产品列表（包含组合详情）
+     * GET /api/subscription/purchased-portfolios
+     */
+    @GetMapping("/purchased-portfolios")
+    public ApiResponse<java.util.List<PurchasedPortfolioVO>> getPurchasedPortfolios(HttpServletRequest request) {
+        Integer userId = getCurrentUserIdOrThrow(request);
+        java.util.List<PurchasedPortfolioVO> portfolios = subscriptionService.getPurchasedPortfolios(userId);
+        return ApiResponse.success(portfolios);
     }
 
     // ========= 从 Session 读取用户ID 的工具方法（和 AgreementController 同一套路） =========
