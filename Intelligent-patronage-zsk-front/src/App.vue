@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ArrowDown } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessageBox } from 'element-plus'
+import AiAssistantBubble from '@/components/AiAssistantBubble.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -22,7 +23,7 @@ const isPublicPage = computed(() => {
 // 根据角色获取菜单项
 const getMenuItems = () => {
   const userRole = authStore.userInfo?.role
-  
+
   const allMenus = [
     {
       index: '/market',
@@ -50,9 +51,9 @@ const getMenuItems = () => {
       roles: ['AUDITOR']  // 只有审核员可以审核
     }
   ]
-  
+
   if (!userRole) return []
-  
+
   return allMenus.filter(menu => menu.roles.includes(userRole))
 }
 
@@ -64,7 +65,7 @@ const handleLogout = async () => {
       cancelButtonText: '取消',
       type: 'warning'
     })
-    
+
     await authStore.logout()
     router.push('/login')
   } catch (error) {
@@ -81,7 +82,7 @@ const menuItems = computed(() => getMenuItems())
     <template v-if="isPublicPage">
       <router-view />
     </template>
-    
+
     <!-- 已登录页面：显示完整布局 -->
     <template v-else>
       <el-container class="app-container">
@@ -145,6 +146,7 @@ const menuItems = computed(() => getMenuItems())
         </el-container>
       </el-container>
     </template>
+    <AiAssistantBubble />
   </div>
 </template>
 

@@ -280,40 +280,6 @@
       </div>
     </el-dialog>
 
-
-<!--    <el-dialog v-model="subscribeVisible" title="签约订购" width="500px">-->
-<!--      <el-form :model="subscribeForm" ref="subscribeFormRef" :rules="subscribeRules" label-width="100px">-->
-<!--        <el-form-item label="客户名称" prop="customerName">-->
-<!--          <el-input v-model="subscribeForm.customerName" placeholder="请输入客户名称" />-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="投资金额(万元)" prop="amount">-->
-<!--          <el-input-number-->
-<!--            v-model="subscribeForm.amount"-->
-<!--            :min="1"-->
-<!--            :precision="2"-->
-<!--            :step="1"-->
-<!--            class="full-width"-->
-<!--          />-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="签约日期" prop="signedAt">-->
-<!--          <el-date-picker-->
-<!--            v-model="subscribeForm.signedAt"-->
-<!--            type="date"-->
-<!--            placeholder="请选择日期"-->
-<!--            style="width: 100%"-->
-<!--          />-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="备注">-->
-<!--          <el-input v-model="subscribeForm.remark" type="textarea" :rows="3" placeholder="可填写附加要求" />-->
-<!--        </el-form-item>-->
-<!--      </el-form>-->
-<!--      <template #footer>-->
-<!--        <span class="dialog-footer">-->
-<!--          <el-button @click="subscribeVisible = false">取消</el-button>-->
-<!--          <el-button type="primary" :loading="submitting" @click="submitSubscribe">确认签约</el-button>-->
-<!--        </span>-->
-<!--      </template>-->
-<!--    </el-dialog>-->
     <el-dialog
       v-model="subscribeVisible"
       :show-close="true"
@@ -439,6 +405,7 @@ import { Search } from '@element-plus/icons-vue'
 import { getApiUrl, API_CONFIG } from '../../config/api'
 import { useAuthStore } from '@/stores/auth'
 import { useRoute, useRouter } from 'vue-router'
+import { useAiContextStore } from '@/stores/aiContext'
 
 const router = useRouter()
 const route = useRoute()
@@ -664,6 +631,13 @@ const handleApiError = (error: any, defaultMsg = '操作失败，请重试') => 
 
   ElMessage.error(errorMsg)
   console.error(`[API Error ${errorCode}]:`, error)
+
+  try {
+    const aiStore = useAiContextStore()
+    aiStore.setLastError(errorCode || 0, errorMsg)
+  } catch (e) {
+    // 忽略 store 未初始化的边缘情况
+  }
 }
 
 const fetchInvestorProfile = async () => {

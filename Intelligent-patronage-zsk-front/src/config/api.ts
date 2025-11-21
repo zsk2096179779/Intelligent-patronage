@@ -40,6 +40,8 @@ export const API_CONFIG = {
     RISK_START: '/api/risk-assessment/start',
     RISK_SUBMIT: '/api/risk-assessment/submit',
 
+    // LLM 智能投顾接口（后端代理到 OpenAI / 本地模型等）
+    LLM: '/api/llm',
 
     AGREEMENT_LIST: '/api/agreements/list',
     AGREEMENT_DETAIL: (id: number) => `/api/agreements/detail/${id}`,

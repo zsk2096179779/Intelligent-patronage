@@ -88,7 +88,7 @@ const routes = [
   // 默认重定向
   {
     path: '/',
-    redirect: (to) => {
+    redirect: () => {
       const authStore = useAuthStore()
       const userInfo = authStore.userInfo
 
