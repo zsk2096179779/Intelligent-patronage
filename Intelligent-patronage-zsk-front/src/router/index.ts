@@ -49,6 +49,12 @@ const routes = [
     meta: { title: '组合配置管理', requiresAuth: true, roles: ['STAFF'] }
   },
   {
+    path: '/portfolio/order-data',
+    name: 'portfolio-order-data',
+    component: () => import('@/views/model3/PortfolioOrderDataView.vue'),
+    meta: { title: '用户订购数据', requiresAuth: true, roles: ['STAFF', 'AUDITOR'] }
+  },
+  {
     path: '/combination/configure/:id',
     name: 'combination-configure',
     component: StrategyCombinationConfigureView,

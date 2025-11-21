@@ -59,7 +59,11 @@ export const API_CONFIG = {
     SUBSCRIPTION_MY_ORDERS: '/api/subscription/my-orders',
     SUBSCRIPTION_PURCHASED_PORTFOLIOS: '/api/subscription/purchased-portfolios',
     SUBSCRIPTION_CHECK_PURCHASED: (portfolioId: number | string) =>
-      `/api/subscription/check-purchased?portfolioId=${portfolioId}`
+      `/api/subscription/check-purchased?portfolioId=${portfolioId}`,
+    // 组合订购数据接口（员工和管理员可见）
+    PORTFOLIO_ORDER_DATA: '/api/strategy-combination/listed/order-data',
+    // 更新组合性能指标接口
+    UPDATE_PORTFOLIO_PERFORMANCE: (id: number) => `/api/strategy-combination/${id}/performance`
   }
 }
 

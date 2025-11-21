@@ -46,6 +46,11 @@ const getMenuItems = () => {
       roles: ['STAFF']  // 只有工作人员可以配置
     },
     {
+      index: '/portfolio/order-data',
+      title: '用户订购数据',
+      roles: ['STAFF', 'AUDITOR']  // 员工和审核员可以查看
+    },
+    {
       index: '/audit',
       title: '策略组合审核',
       roles: ['AUDITOR']  // 只有审核员可以审核

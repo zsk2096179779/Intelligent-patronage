@@ -11,56 +11,111 @@
     <el-card class="list-card" shadow="never">
       <template #header>
         <div class="card-header">
-          <span>待配置组合列表</span>
+          <span>组合列表</span>
           <el-button :icon="Refresh" circle @click="fetchData" :loading="loading" />
         </div>
       </template>
 
-      <el-table :data="tableData" border stripe v-loading="loading" style="width: 100%">
-        <el-table-column prop="portfolioId" label="组合ID" width="100" align="center" />
-        <el-table-column prop="portfolioName" label="组合名称" min-width="150" />
-        <el-table-column prop="riskLevel" label="风险等级" width="120" align="center">
-          <template #default="scope">
-            <el-tag :type="getRiskTagType(scope.row.riskLevel)">
-              {{ scope.row.riskLevel || '—' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="strategyName" label="关联策略" min-width="150" />
-        <el-table-column prop="portfolioStrategyType" label="策略类型" width="120" />
-        <el-table-column prop="createTime" label="创建时间" width="180">
-          <template #default="scope">
-            {{ formatDateTime(scope.row.createTime) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="配置状态" width="120" align="center">
-          <template #default="scope">
-            <el-tag type="warning">待配置</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="150" align="center" fixed="right">
-          <template #default="scope">
-            <el-button type="primary" size="small" @click="goToConfigure(scope.row.portfolioId)">
-              开始配置
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <el-tabs v-model="activeTab" @tab-change="handleTabChange">
+        <el-tab-pane label="待配置" name="draft">
+          <el-table :data="draftData" border stripe v-loading="loading" style="width: 100%">
+            <el-table-column prop="portfolioId" label="组合ID" width="100" align="center" />
+            <el-table-column prop="portfolioName" label="组合名称" min-width="150" />
+            <el-table-column prop="riskLevel" label="风险等级" width="120" align="center">
+              <template #default="scope">
+                <el-tag :type="getRiskTagType(scope.row.riskLevel)">
+                  {{ scope.row.riskLevel || '—' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="strategyName" label="关联策略" min-width="150" />
+            <el-table-column prop="portfolioStrategyType" label="策略类型" width="120" />
+            <el-table-column prop="createTime" label="创建时间" width="180">
+              <template #default="scope">
+                {{ formatDateTime(scope.row.createTime) }}
+              </template>
+            </el-table-column>
+            <el-table-column label="配置状态" width="120" align="center">
+              <template #default="scope">
+                <el-tag type="warning">待配置</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="150" align="center" fixed="right">
+              <template #default="scope">
+                <el-button type="primary" size="small" @click="goToConfigure(scope.row.portfolioId)">
+                  开始配置
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div v-if="draftData.length === 0 && !loading" class="empty-state">
+            <el-empty description="暂无待配置的组合" />
+          </div>
+        </el-tab-pane>
 
-      <div v-if="tableData.length === 0 && !loading" class="empty-state">
-        <el-empty description="暂无待配置的组合" />
-      </div>
+        <el-tab-pane label="已上架" name="listed">
+          <el-table :data="listedData" border stripe v-loading="loading" style="width: 100%">
+            <el-table-column prop="portfolioId" label="组合ID" width="100" align="center" />
+            <el-table-column prop="portfolioName" label="组合名称" min-width="150" />
+            <el-table-column prop="riskLevel" label="风险等级" width="120" align="center">
+              <template #default="scope">
+                <el-tag :type="getRiskTagType(scope.row.riskLevel)">
+                  {{ scope.row.riskLevel || '—' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="strategyName" label="关联策略" min-width="150" />
+            <el-table-column prop="portfolioStrategyType" label="策略类型" width="120" />
+            <el-table-column prop="returnRate" label="策略收益(%)" width="120" align="right">
+              <template #default="scope">
+                {{ formatPercent(scope.row.returnRate) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="annualReturn" label="年化收益(%)" width="120" align="right">
+              <template #default="scope">
+                {{ formatPercent(scope.row.annualReturn) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="maxDrawdown" label="最大回撤(%)" width="120" align="right">
+              <template #default="scope">
+                <span class="down-color">{{ formatPercent(scope.row.maxDrawdown) }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="180" align="center" fixed="right">
+              <template #default="scope">
+                <el-button type="primary" size="small" @click="openPerformanceDialog(scope.row)">
+                  设置性能指标
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div v-if="listedData.length === 0 && !loading" class="empty-state">
+            <el-empty description="暂无已上架的组合" />
+          </div>
+        </el-tab-pane>
+      </el-tabs>
     </el-card>
+
+    <!-- 性能指标编辑对话框 -->
+    <PerformanceIndicatorEditDialog
+      :visible="performanceDialogVisible"
+      :portfolio-id="currentPortfolioId"
+      :portfolio-name="currentPortfolioName"
+      :initial-data="currentPerformanceData"
+      @update:visible="performanceDialogVisible = $event"
+      @success="handlePerformanceUpdateSuccess"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { Refresh } from '@element-plus/icons-vue'
 import { getApiUrl, API_CONFIG } from '../../config/api'
+import PerformanceIndicatorEditDialog from './PerformanceIndicatorEditDialog.vue'
 
 interface Portfolio {
   portfolioId: number
@@ -74,11 +129,36 @@ interface Portfolio {
   createTime: string
   listed: number // 0-待配置/待审批，1-已通过，-1-已拒绝
   status?: string // draft-未配置, pending_review-待审核
+  returnRate?: number
+  annualReturn?: number
+  maxDrawdown?: number
+  sharpeRatio?: number
+  volatility?: number
+  winRate?: number
 }
 
 const router = useRouter()
 const tableData = ref<Portfolio[]>([])
 const loading = ref(false)
+const activeTab = ref('draft')
+
+// 性能指标编辑对话框相关
+const performanceDialogVisible = ref(false)
+const currentPortfolioId = ref<number | null>(null)
+const currentPortfolioName = ref('')
+const currentPerformanceData = ref<any>(null)
+
+// 筛选数据
+const draftData = computed(() => {
+  return tableData.value.filter(item => {
+    const status = (item.status || '').toString().trim().toLowerCase()
+    return status === '' || status === 'draft'
+  })
+})
+
+const listedData = computed(() => {
+  return tableData.value.filter(item => item.listed === 1)
+})
 
 const getRiskTagType = (riskLevel: string) => {
   const riskMap: Record<string, string> = {
@@ -153,20 +233,6 @@ const fetchData = async () => {
       // 优先使用 created_at（后端新字段）
       const createTime = item.created_at ?? item.createdAt ?? item.createTime ?? item.create_time ?? item.createDate ?? item.create_date ?? null
       
-      // 调试日志：查看第一个条目的原始数据和时间字段
-      if (dataArray.indexOf(item) === 0) {
-        console.log('配置列表 - 原始数据示例:', item)
-        console.log('配置列表 - 提取的创建时间:', createTime)
-        console.log('配置列表 - 所有时间相关字段:', {
-          created_at: item.created_at,
-          createdAt: item.createdAt,
-          createTime: item.createTime,
-          create_time: item.create_time,
-          createDate: item.createDate,
-          create_date: item.create_date
-        })
-      }
-      
       return {
         portfolioId: item.portfolioId ?? item.portfolio_id ?? item.id,
         portfolioName: item.portfolioName ?? item.portfolio_name ?? item.name ?? '',
@@ -178,17 +244,18 @@ const fetchData = async () => {
         strategyRefId: item.strategyRefId ?? item.strategy_ref_id ?? item.strategyId ?? item.strategy_id ?? 0,
         createTime: createTime || '',
         listed: item.listed ?? 0,
-        status: item.status ?? item.state ?? ''
+        status: item.status ?? item.state ?? '',
+        returnRate: item.returnRate ?? item.return_rate ?? null,
+        annualReturn: item.annualReturn ?? item.annual_return ?? null,
+        maxDrawdown: item.maxDrawdown ?? item.max_drawdown ?? null,
+        sharpeRatio: item.sharpeRatio ?? item.sharpe_ratio ?? null,
+        volatility: item.volatility ?? null,
+        winRate: item.winRate ?? item.win_rate ?? null
       }
     })
 
-    // 只显示未配置的组合（status = 'draft' 表示草稿未提交）
-    tableData.value = normalizedData
-      .filter(item => {
-        const status = (item.status || '').toString().trim().toLowerCase()
-        return status === '' || status === 'draft'
-      })
-      .sort((a, b) => (a.portfolioId || 0) - (b.portfolioId || 0))
+    // 显示所有组合，按ID排序
+    tableData.value = normalizedData.sort((a, b) => (a.portfolioId || 0) - (b.portfolioId || 0))
   } catch (error) {
     console.error('获取组合列表失败', error)
     if (axios.isAxiosError(error)) {
@@ -207,6 +274,42 @@ const goToCreate = () => {
 
 const goToConfigure = (portfolioId: number) => {
   router.push(`/combination/configure/${portfolioId}`)
+}
+
+// 格式化百分比
+const formatPercent = (value: number | null | undefined) => {
+  if (value === undefined || value === null || isNaN(value)) return '—'
+  // 如果值大于1，说明已经是百分比形式，直接显示
+  if (Math.abs(value) > 1) {
+    return `${Number(value).toFixed(2)}%`
+  }
+  // 如果值小于等于1，说明是小数形式，转换为百分比
+  return `${(Number(value) * 100).toFixed(2)}%`
+}
+
+// 打开性能指标编辑对话框
+const openPerformanceDialog = (row: Portfolio) => {
+  currentPortfolioId.value = row.portfolioId
+  currentPortfolioName.value = row.portfolioName
+  currentPerformanceData.value = {
+    returnRate: row.returnRate ?? null,
+    annualReturn: row.annualReturn ?? null,
+    maxDrawdown: row.maxDrawdown ?? null,
+    sharpeRatio: row.sharpeRatio ?? null,
+    volatility: row.volatility ?? null,
+    winRate: row.winRate ?? null
+  }
+  performanceDialogVisible.value = true
+}
+
+// 性能指标更新成功后的处理
+const handlePerformanceUpdateSuccess = () => {
+  fetchData()
+}
+
+// 标签页切换
+const handleTabChange = (tabName: string) => {
+  // 切换标签页时不需要额外操作，computed 会自动更新
 }
 
 onMounted(() => {
@@ -253,6 +356,11 @@ onMounted(() => {
 
 .empty-state {
   padding: 40px 0;
+}
+
+.down-color {
+  color: #f56c6c;
+  font-weight: 500;
 }
 </style>
 

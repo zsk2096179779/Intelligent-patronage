@@ -23,6 +23,7 @@ const PAGE_MAP: Record<string, string> = {
   '/subscription/purchased': '已购组合产品 (查看已持有的策略)',
   '/combination/create': '策略组合创建页 (Staff权限)',
   '/combination/configure': '组合配置列表页 (Staff权限)',
+  '/portfolio/order-data': '用户订购数据查看页 (员工和管理员可见，查看已上架组合产品的用户订购数据)',
   '/risk/assessment': '风险承受能力评估页 (必须完成才能交易)',
   '/subscription/my-orders': '我的订阅订单记录',
   '/otc/open': '场外(OTC)账户开通页',
