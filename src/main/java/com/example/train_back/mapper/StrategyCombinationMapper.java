@@ -1,5 +1,6 @@
 package com.example.train_back.mapper;
 
+import com.example.train_back.dto.ListedPortfolioOrderDataDTO;
 import com.example.train_back.dto.PortfolioDetailDTO;
 import com.example.train_back.entity.StrategyCombination;
 import org.apache.ibatis.annotations.Mapper;
@@ -70,5 +71,32 @@ public interface StrategyCombinationMapper {
      * @return 更新的行数
      */
     int updateStatus(@Param("id") Integer id, @Param("status") String status);
+    
+    /**
+     * 查询已上架组合产品的用户订购数据
+     * @return 已上架组合产品的订购数据列表
+     */
+    List<ListedPortfolioOrderDataDTO> selectListedPortfolioOrderData();
+    
+    /**
+     * 更新组合收益指标
+     * @param portfolioId 组合ID
+     * @param returnRate 策略收益（%）
+     * @param annualReturn 年化收益（%）
+     * @param maxDrawdown 最大回撤（%）
+     * @param sharpeRatio 夏普比率
+     * @param volatility 波动率（%）
+     * @param winRate 胜率（%）
+     * @return 更新的行数
+     */
+    int updatePortfolioPerformance(
+            @Param("portfolioId") Integer portfolioId,
+            @Param("returnRate") java.math.BigDecimal returnRate,
+            @Param("annualReturn") java.math.BigDecimal annualReturn,
+            @Param("maxDrawdown") java.math.BigDecimal maxDrawdown,
+            @Param("sharpeRatio") java.math.BigDecimal sharpeRatio,
+            @Param("volatility") java.math.BigDecimal volatility,
+            @Param("winRate") java.math.BigDecimal winRate
+    );
 }
 

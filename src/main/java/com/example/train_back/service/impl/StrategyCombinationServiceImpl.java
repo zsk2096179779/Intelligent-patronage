@@ -1,7 +1,9 @@
 package com.example.train_back.service.impl;
 
+import com.example.train_back.dto.ListedPortfolioOrderDataDTO;
 import com.example.train_back.dto.PortfolioDetailDTO;
 import com.example.train_back.dto.UpdatePortfolioBasicInfoDTO;
+import com.example.train_back.dto.UpdatePortfolioPerformanceDTO;
 import com.example.train_back.entity.StrategyCombination;
 import com.example.train_back.mapper.StrategyCombinationMapper;
 import com.example.train_back.service.StrategyCombinationService;
@@ -103,6 +105,34 @@ public class StrategyCombinationServiceImpl implements StrategyCombinationServic
         
         // 更新状态为待审核
         int rows = strategyCombinationMapper.updateStatus(portfolioId, "pending_review");
+        return rows > 0;
+    }
+    
+    @Override
+    public List<ListedPortfolioOrderDataDTO> getListedPortfolioOrderData() {
+        return strategyCombinationMapper.selectListedPortfolioOrderData();
+    }
+    
+    @Override
+    @Transactional
+    public boolean updatePortfolioPerformance(Integer portfolioId, UpdatePortfolioPerformanceDTO performanceDTO) {
+        // 检查组合是否存在
+        StrategyCombination portfolio = strategyCombinationMapper.selectById(portfolioId);
+        if (portfolio == null) {
+            return false;
+        }
+        
+        // 更新收益指标
+        int rows = strategyCombinationMapper.updatePortfolioPerformance(
+                portfolioId,
+                performanceDTO.getReturnRate(),
+                performanceDTO.getAnnualReturn(),
+                performanceDTO.getMaxDrawdown(),
+                performanceDTO.getSharpeRatio(),
+                performanceDTO.getVolatility(),
+                performanceDTO.getWinRate()
+        );
+        
         return rows > 0;
     }
 }

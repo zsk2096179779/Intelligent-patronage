@@ -68,6 +68,38 @@ public class StrategyCombination {
     private LocalDateTime updatedAt;
 
     private BigDecimal feeRate;
+    
+    // ========== 收益指标字段 ==========
+    
+    /**
+     * 策略收益（%）
+     */
+    private BigDecimal returnRate;
+    
+    /**
+     * 年化收益（%）
+     */
+    private BigDecimal annualReturn;
+    
+    /**
+     * 最大回撤（%）
+     */
+    private BigDecimal maxDrawdown;
+    
+    /**
+     * 夏普比率
+     */
+    private BigDecimal sharpeRatio;
+    
+    /**
+     * 波动率（%）
+     */
+    private BigDecimal volatility;
+    
+    /**
+     * 胜率（%）
+     */
+    private BigDecimal winRate;
 
     public StrategyCombination() {
     }

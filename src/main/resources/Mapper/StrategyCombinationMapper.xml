@@ -50,12 +50,13 @@
             s.scale,
             s.funds,
             s.fee_rate,
-            s.return_rate,
-            s.annual_return,
-            s.volatility,
-            s.sharpe_ratio,
-            s.max_drawdown,
-            s.win_rate
+            -- 收益指标从 portfolios 表读取，如果没有则从 strategies 表读取（兼容性）
+            COALESCE(p.return_rate, s.return_rate) AS return_rate,
+            COALESCE(p.annual_return, s.annual_return) AS annual_return,
+            COALESCE(p.volatility, s.volatility) AS volatility,
+            COALESCE(p.sharpe_ratio, s.sharpe_ratio) AS sharpe_ratio,
+            COALESCE(p.max_drawdown, s.max_drawdown) AS max_drawdown,
+            COALESCE(p.win_rate, s.win_rate) AS win_rate
         FROM portfolios p
                  LEFT JOIN strategies s ON p.strategy_id = s.strategy_ref_id
         ORDER BY p.id DESC
@@ -80,12 +81,13 @@
             s.scale,
             s.funds,
             s.fee_rate,
-            s.return_rate,
-            s.annual_return,
-            s.volatility,
-            s.sharpe_ratio,
-            s.max_drawdown,
-            s.win_rate
+            -- 收益指标从 portfolios 表读取，如果没有则从 strategies 表读取（兼容性）
+            COALESCE(p.return_rate, s.return_rate) AS return_rate,
+            COALESCE(p.annual_return, s.annual_return) AS annual_return,
+            COALESCE(p.volatility, s.volatility) AS volatility,
+            COALESCE(p.sharpe_ratio, s.sharpe_ratio) AS sharpe_ratio,
+            COALESCE(p.max_drawdown, s.max_drawdown) AS max_drawdown,
+            COALESCE(p.win_rate, s.win_rate) AS win_rate
         FROM portfolios p
                  LEFT JOIN strategies s ON p.strategy_id = s.strategy_ref_id
         WHERE p.id = #{portfolioId}
@@ -134,7 +136,10 @@
     <select id="selectById" resultType="com.example.train_back.entity.StrategyCombination">
         SELECT 
             id, name, risk_level, strategy_type, summary, target_investor,
-            strategy_id, listed, status, created_at, updated_at
+            strategy_id, listed, status, created_at, updated_at,
+            return_rate AS returnRate, annual_return AS annualReturn,
+            max_drawdown AS maxDrawdown, sharpe_ratio AS sharpeRatio,
+            volatility, win_rate AS winRate
         FROM portfolios
         WHERE id = #{id}
     </select>
@@ -155,7 +160,13 @@
             p.status          AS status,
             p.created_at      AS createdAt,
             p.updated_at      AS updatedAt,
-            s.fee_rate        AS feerate
+            s.fee_rate        AS feerate,
+            p.return_rate     AS returnRate,
+            p.annual_return   AS annualReturn,
+            p.max_drawdown    AS maxDrawdown,
+            p.sharpe_ratio    AS sharpeRatio,
+            p.volatility      AS volatility,
+            p.win_rate        AS winRate
         FROM portfolios p
                  LEFT JOIN strategies s
                            ON p.strategy_id = s.strategy_ref_id
@@ -170,6 +181,70 @@
             updated_at = NOW()
         WHERE id = #{id}
     </update>
+
+    <!-- 查询已上架组合产品的用户订购数据结果映射 -->
+    <resultMap id="ListedPortfolioOrderDataResultMap" type="com.example.train_back.dto.ListedPortfolioOrderDataDTO">
+        <!-- 组合基本信息 -->
+        <id column="portfolio_id" property="portfolioId" jdbcType="INTEGER"/>
+        <result column="portfolio_name" property="portfolioName" jdbcType="VARCHAR"/>
+        <result column="risk_level" property="riskLevel" jdbcType="VARCHAR"/>
+        <result column="portfolio_strategy_type" property="portfolioStrategyType" jdbcType="VARCHAR"/>
+        <result column="strategy_name" property="strategyName" jdbcType="VARCHAR"/>
+        <result column="strategy_type" property="strategyType" jdbcType="VARCHAR"/>
+        <result column="summary" property="summary" jdbcType="VARCHAR"/>
+        <result column="target_investor" property="targetInvestor" jdbcType="VARCHAR"/>
+        <result column="portfolio_created_at" property="portfolioCreatedAt" jdbcType="TIMESTAMP"/>
+        
+        <!-- 订购统计数据 -->
+        <result column="total_order_count" property="totalOrderCount" jdbcType="BIGINT"/>
+        <result column="completed_order_count" property="completedOrderCount" jdbcType="BIGINT"/>
+        <result column="total_subscription_amount" property="totalSubscriptionAmount" jdbcType="DECIMAL"/>
+        <result column="completed_subscription_amount" property="completedSubscriptionAmount" jdbcType="DECIMAL"/>
+        <result column="total_user_count" property="totalUserCount" jdbcType="BIGINT"/>
+        <result column="avg_subscription_amount" property="avgSubscriptionAmount" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <!-- 更新组合收益指标 -->
+    <update id="updatePortfolioPerformance">
+        UPDATE portfolios
+        SET return_rate = #{returnRate},
+            annual_return = #{annualReturn},
+            max_drawdown = #{maxDrawdown},
+            sharpe_ratio = #{sharpeRatio},
+            volatility = #{volatility},
+            win_rate = #{winRate},
+            updated_at = NOW()
+        WHERE id = #{portfolioId}
+    </update>
+
+    <!-- 查询已上架组合产品的用户订购数据 -->
+    <select id="selectListedPortfolioOrderData" resultMap="ListedPortfolioOrderDataResultMap">
+        SELECT
+            p.id AS portfolio_id,
+            p.name AS portfolio_name,
+            p.risk_level,
+            p.strategy_type AS portfolio_strategy_type,
+            p.summary,
+            p.target_investor,
+            p.created_at AS portfolio_created_at,
+            s.name AS strategy_name,
+            s.strategy_type AS strategy_type,
+            -- 订购统计数据
+            COALESCE(COUNT(DISTINCT so.id), 0) AS total_order_count,
+            COALESCE(COUNT(DISTINCT CASE WHEN so.order_status = 'completed' THEN so.id END), 0) AS completed_order_count,
+            COALESCE(SUM(so.subscription_amount), 0) AS total_subscription_amount,
+            COALESCE(SUM(CASE WHEN so.order_status = 'completed' THEN so.subscription_amount ELSE 0 END), 0) AS completed_subscription_amount,
+            COALESCE(COUNT(DISTINCT so.user_id), 0) AS total_user_count,
+            COALESCE(AVG(CASE WHEN so.subscription_amount IS NOT NULL THEN so.subscription_amount END), 0) AS avg_subscription_amount
+        FROM portfolios p
+        LEFT JOIN strategies s ON p.strategy_id = s.strategy_ref_id
+        LEFT JOIN subscription_order so ON p.id = so.portfolio_id
+        WHERE p.listed = 1
+        GROUP BY 
+            p.id, p.name, p.risk_level, p.strategy_type, p.summary, p.target_investor, 
+            p.created_at, s.name, s.strategy_type
+        ORDER BY p.id DESC
+    </select>
 
 </mapper>
 

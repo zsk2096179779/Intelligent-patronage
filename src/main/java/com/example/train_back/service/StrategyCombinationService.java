@@ -1,5 +1,6 @@
 package com.example.train_back.service;
 
+import com.example.train_back.dto.ListedPortfolioOrderDataDTO;
 import com.example.train_back.dto.PortfolioDetailDTO;
 import com.example.train_back.dto.UpdatePortfolioBasicInfoDTO;
 import com.example.train_back.entity.StrategyCombination;
@@ -65,5 +66,19 @@ public interface StrategyCombinationService {
      * @return 是否成功
      */
     boolean submitForReview(Integer portfolioId);
+    
+    /**
+     * 查询已上架组合产品的用户订购数据
+     * @return 已上架组合产品的订购数据列表
+     */
+    List<ListedPortfolioOrderDataDTO> getListedPortfolioOrderData();
+    
+    /**
+     * 更新组合收益指标
+     * @param portfolioId 组合ID
+     * @param performanceDTO 收益指标DTO
+     * @return 是否成功
+     */
+    boolean updatePortfolioPerformance(Integer portfolioId, com.example.train_back.dto.UpdatePortfolioPerformanceDTO performanceDTO);
 }
 

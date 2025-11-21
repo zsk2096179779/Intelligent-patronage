@@ -326,5 +326,64 @@ public class StrategyCombinationController {
             return ResponseEntity.status(500).body(response);
         }
     }
+    
+    /**
+     * 查询已上架组合产品的用户订购数据
+     * @return 响应结果
+     */
+    @GetMapping("/listed/order-data")
+    public ResponseEntity<Map<String, Object>> getListedPortfolioOrderData() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<ListedPortfolioOrderDataDTO> orderData = strategyCombinationService.getListedPortfolioOrderData();
+            response.put("code", 200);
+            response.put("message", "查询成功");
+            response.put("data", orderData);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("code", 500);
+            response.put("message", "查询失败：" + e.getMessage());
+            response.put("data", null);
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+    
+    /**
+     * 更新组合收益指标
+     * 说明：此接口用于更新组合产品的实际运行数据（收益指标）
+     * 可以在以下场景使用：
+     * 1. 管理员手动输入基于历史回测的预估数据
+     * 2. 系统定时任务自动计算和更新实际运行数据
+     * 3. 第三方数据分析系统推送计算结果
+     * 
+     * @param id 组合ID
+     * @param performanceDTO 收益指标数据
+     * @return 响应结果
+     */
+    @PutMapping("/{id}/performance")
+    public ResponseEntity<Map<String, Object>> updatePortfolioPerformance(
+            @PathVariable Integer id,
+            @RequestBody com.example.train_back.dto.UpdatePortfolioPerformanceDTO performanceDTO) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            boolean success = strategyCombinationService.updatePortfolioPerformance(id, performanceDTO);
+            if (success) {
+                response.put("code", 200);
+                response.put("message", "更新成功");
+                response.put("data", null);
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("code", 400);
+                response.put("message", "更新失败：组合不存在");
+                response.put("data", null);
+                return ResponseEntity.badRequest().body(response);
+            }
+        } catch (Exception e) {
+            response.put("code", 500);
+            response.put("message", "更新失败：" + e.getMessage());
+            response.put("data", null);
+            return ResponseEntity.status(500).body(response);
+        }
+    }
 }
 
