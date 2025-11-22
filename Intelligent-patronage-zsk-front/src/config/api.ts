@@ -63,7 +63,9 @@ export const API_CONFIG = {
     // 组合订购数据接口（员工和管理员可见）
     PORTFOLIO_ORDER_DATA: '/api/strategy-combination/listed/order-data',
     // 更新组合性能指标接口
-    UPDATE_PORTFOLIO_PERFORMANCE: (id: number) => `/api/strategy-combination/${id}/performance`
+    UPDATE_PORTFOLIO_PERFORMANCE: (id: number) => `/api/strategy-combination/${id}/performance`,
+    // 获取组合详情接口（包含完整收益指标）
+    GET_PORTFOLIO_DETAIL: (id: number) => `/combos/${id}`
   }
 }
 

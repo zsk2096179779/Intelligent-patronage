@@ -48,8 +48,11 @@
             {{ formatDateTime(row.subscribedAt) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="160" fixed="right">
+        <el-table-column label="操作" width="220" fixed="right">
           <template #default="{ row }">
+            <el-button type="primary" link @click="openDetailDialog(row)">
+              查看详情
+            </el-button>
             <el-button type="primary" link @click="openAppendDialog(row)">
               追加购入
             </el-button>
@@ -62,6 +65,13 @@
       v-if="!loading && portfolios.length === 0"
       description="暂无已购组合"
       style="margin-top: 40px"
+    />
+
+    <!-- 组合详情对话框 -->
+    <PortfolioDetailDialog
+      :visible="detailDialogVisible"
+      :portfolio-id="currentPortfolioId"
+      @update:visible="detailDialogVisible = $event"
     />
 
     <el-dialog
@@ -115,6 +125,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { getApiUrl, API_CONFIG } from '@/config/api'
 import { useAuthStore } from '@/stores/auth'
+import PortfolioDetailDialog from '@/components/model3/PortfolioDetailDialog.vue'
 
 interface PurchasedPortfolio {
   portfolioId: number
@@ -130,6 +141,8 @@ const isUser = computed(() => authStore.userInfo?.role === 'USER')
 const loading = ref(false)
 const portfolios = ref<PurchasedPortfolio[]>([])
 
+const detailDialogVisible = ref(false)
+const currentPortfolioId = ref<number | null>(null)
 const appendDialogVisible = ref(false)
 const appendSubmitting = ref(false)
 const appendFormRef = ref()
@@ -222,6 +235,11 @@ const formatDateTime = (value?: string) => {
 onMounted(() => {
   loadPurchasedPortfolios()
 })
+
+const openDetailDialog = (row: PurchasedPortfolio) => {
+  currentPortfolioId.value = row.portfolioId
+  detailDialogVisible.value = true
+}
 
 const openAppendDialog = (row: PurchasedPortfolio) => {
   appendForm.portfolioId = row.portfolioId

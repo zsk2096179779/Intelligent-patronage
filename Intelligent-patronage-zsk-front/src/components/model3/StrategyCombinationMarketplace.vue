@@ -120,7 +120,6 @@
             <el-descriptions-item label="风险等级">{{ selectedCombo.riskLevel || '—' }}</el-descriptions-item>
             <el-descriptions-item label="策略描述" :span="2">{{ selectedCombo.description || '—' }}</el-descriptions-item>
             <el-descriptions-item label="创立时间">{{ formatDateTime(selectedCombo.createTime) }}</el-descriptions-item>
-            <el-descriptions-item label="资产规模">{{ formatScale(selectedCombo.scale) }} 亿元</el-descriptions-item>
           </el-descriptions>
 
           <el-divider />
@@ -803,11 +802,57 @@ watch(
 )
 
 // ====== 查看组合详情 & 成份基金 ======
-const openDetail = (item: CombinationItem) => {
+const openDetail = async (item: CombinationItem) => {
   selectedCombo.value = item
   detailVisible.value = true
   loadHoldings(item.portfolioId)
   ensurePurchaseStatus(item.portfolioId)
+  // 获取最新的组合详情（包含完整收益指标）
+  await loadPortfolioDetail(item.portfolioId)
+}
+
+// 加载组合详情（获取最新收益指标）
+const loadPortfolioDetail = async (portfolioId: number) => {
+  try {
+    const response = await axios.get(
+      getApiUrl(API_CONFIG.ENDPOINTS.GET_PORTFOLIO_DETAIL(portfolioId)),
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+
+    let data: any = null
+
+    // 处理不同的响应格式
+    if (response.data && response.data.code === 200 && response.data.data) {
+      data = response.data.data
+    } else if (response.data && !response.data.code) {
+      data = response.data
+    }
+
+    if (data && selectedCombo.value) {
+      // 更新选中组合的完整数据（包括收益指标和资产规模等）
+      selectedCombo.value.returnRate = data.returnRate ?? data.return_rate ?? selectedCombo.value.returnRate
+      selectedCombo.value.annualReturn = data.annualReturn ?? data.annual_return ?? selectedCombo.value.annualReturn
+      selectedCombo.value.maxDrawdown = data.maxDrawdown ?? data.max_drawdown ?? selectedCombo.value.maxDrawdown
+      selectedCombo.value.sharpeRatio = data.sharpeRatio ?? data.sharpe_ratio ?? selectedCombo.value.sharpeRatio
+      selectedCombo.value.volatility = data.volatility ?? selectedCombo.value.volatility
+      selectedCombo.value.winRate = data.winRate ?? data.win_rate ?? selectedCombo.value.winRate
+      // 更新资产规模
+      if (data.scale !== undefined && data.scale !== null) {
+        selectedCombo.value.scale = data.scale
+      }
+      // 更新其他基本信息
+      if (data.description !== undefined) {
+        selectedCombo.value.description = data.description ?? data.desc ?? selectedCombo.value.description
+      }
+    }
+  } catch (error) {
+    // 静默失败，不影响详情显示
+    console.warn('获取组合详情失败，使用列表数据', error)
+  }
 }
 
 const loadHoldings = async (portfolioId: number) => {
@@ -1239,7 +1284,15 @@ const formatPercent = (value?: number) => {
   return `${(Math.abs(value) > 1 ? value : value * 100).toFixed(2)}%`
 }
 const formatDateTime = (value?: string) => { /* ... */ return value || '-' }
-const formatScale = (value?: number) => { /* ... */ return value ? (value / 10000).toFixed(2) : '—' }
+const formatScale = (value?: number) => {
+  if (value === undefined || value === null || isNaN(value)) return '—'
+  // 如果值大于等于10000，假设单位是元，转换为亿元（除以1亿）
+  if (value >= 10000) {
+    return (Number(value) / 100000000).toFixed(2)
+  }
+  // 如果值较小，可能已经是亿元单位，直接显示
+  return Number(value).toFixed(2)
+}
 
 onMounted(() => {
   fetchData()
