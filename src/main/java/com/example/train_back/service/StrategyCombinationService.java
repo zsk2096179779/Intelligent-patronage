@@ -19,6 +19,13 @@ public interface StrategyCombinationService {
     List<PortfolioDetailDTO> getAllPortfolioDetails();
     
     /**
+     * 根据组合ID查询组合详情（包含策略信息和收益指标）
+     * @param portfolioId 组合ID
+     * @return 组合详情，包含年化收益、累计收益等指标
+     */
+    PortfolioDetailDTO getPortfolioDetailById(Integer portfolioId);
+    
+    /**
      * 审核通过：将组合的 listed 字段从 0 更新为 签约业务模块设计.md
      * @param id 组合ID
      * @return 是否更新成功

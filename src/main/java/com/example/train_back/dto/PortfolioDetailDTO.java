@@ -27,9 +27,14 @@ public class PortfolioDetailDTO {
     private String portfolioStrategyType;
     
     /**
-     * 是否上架（0-未上架/未审核，签约业务模块设计.md-已上架/已审核，-签约业务模块设计.md-已拒绝）
+     * 是否上架（0-未上架/未审核，1-已上架/已审核，-1-已拒绝）
      */
     private Integer listed;
+    
+    /**
+     * 上架状态文本（已上架/未上架/已拒绝）- 便于前端直接显示
+     */
+    private String listedText;
     
     /**
      * 审核状态（draft/pending_review/approved/rejected）
@@ -160,6 +165,28 @@ public class PortfolioDetailDTO {
 
     public void setListed(Integer listed) {
         this.listed = listed;
+        // 自动设置上架状态文本
+        if (listed != null) {
+            if (listed == 1) {
+                this.listedText = "已上架";
+            } else if (listed == 0) {
+                this.listedText = "未上架";
+            } else if (listed == -1) {
+                this.listedText = "已拒绝";
+            } else {
+                this.listedText = "未知";
+            }
+        } else {
+            this.listedText = null;
+        }
+    }
+
+    public String getListedText() {
+        return listedText;
+    }
+
+    public void setListedText(String listedText) {
+        this.listedText = listedText;
     }
 
     public String getStatus() {

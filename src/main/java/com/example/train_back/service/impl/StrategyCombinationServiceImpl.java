@@ -24,7 +24,37 @@ public class StrategyCombinationServiceImpl implements StrategyCombinationServic
     
     @Override
     public List<PortfolioDetailDTO> getAllPortfolioDetails() {
-        return strategyCombinationMapper.selectAllPortfolioDetails();
+        List<PortfolioDetailDTO> details = strategyCombinationMapper.selectAllPortfolioDetails();
+        // 设置上架状态文本
+        details.forEach(this::setListedText);
+        return details;
+    }
+    
+    @Override
+    public PortfolioDetailDTO getPortfolioDetailById(Integer portfolioId) {
+        PortfolioDetailDTO detail = strategyCombinationMapper.selectPortfolioDetailById(portfolioId);
+        if (detail != null) {
+            // 设置上架状态文本
+            setListedText(detail);
+        }
+        return detail;
+    }
+    
+    /**
+     * 设置上架状态文本
+     */
+    private void setListedText(PortfolioDetailDTO dto) {
+        if (dto.getListed() != null) {
+            if (dto.getListed() == 1) {
+                dto.setListedText("已上架");
+            } else if (dto.getListed() == 0) {
+                dto.setListedText("未上架");
+            } else if (dto.getListed() == -1) {
+                dto.setListedText("已拒绝");
+            } else {
+                dto.setListedText("未知");
+            }
+        }
     }
     
     @Override
