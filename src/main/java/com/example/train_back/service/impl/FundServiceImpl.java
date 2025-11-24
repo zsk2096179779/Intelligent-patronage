@@ -1,5 +1,6 @@
 package com.example.train_back.service.impl;
 
+import com.example.train_back.dto.FundFilterRequest;
 import com.example.train_back.entity.Fund;
 import com.example.train_back.mapper.FundMapper;
 import com.example.train_back.service.FundService;
@@ -50,6 +51,14 @@ public class FundServiceImpl implements FundService {
         }
         Fund fund = fundMapper.selectByFundCode(fundCode.trim());
         return fund != null;
+    }
+
+    @Override
+    public List<Fund> filterFunds(FundFilterRequest filterRequest) {
+        if (filterRequest == null || !filterRequest.hasAnyFilter()) {
+            return getAllFunds();
+        }
+        return fundMapper.filterFunds(filterRequest);
     }
 }
 

@@ -653,6 +653,11 @@ curl -X POST http://localhost:8080/api/strategy-combination/1/reject \
 
 **查询参数：**
 - `keyword` (String, 可选): 搜索关键词（基金代码或名称模糊匹配）
+- `fundType` (String, 可选): 基金类型（如：股票型、债券型等）
+- `category` (String, 可选): 分类（如：权益类、货币类等）
+- `operationCycle` (String, 可选): 运作周期
+- `minFundSize` / `maxFundSize` (Double, 可选): 基金规模范围（单位：亿元）
+- `minFeeRate` / `maxFeeRate` (Double, 可选): 费率范围（单位：%）
 
 **响应格式（成功）：**
 
@@ -681,8 +686,11 @@ curl -X POST http://localhost:8080/api/strategy-combination/1/reject \
 # 查询所有基金
 curl http://localhost:8080/api/funds
 
-# 搜索基金
-curl http://localhost:8080/api/funds?keyword=000001
+# 根据关键词搜索基金
+curl "http://localhost:8080/api/funds?keyword=000001"
+
+# 组合筛选示例：查询股票型、规模大于10亿元且费率小于1%的基金
+curl "http://localhost:8080/api/funds?fundType=%E8%82%A1%E7%A5%A8%E5%9E%8B&minFundSize=10&maxFeeRate=1"
 ```
 
 ### 13. 根据基金代码查询基金信息

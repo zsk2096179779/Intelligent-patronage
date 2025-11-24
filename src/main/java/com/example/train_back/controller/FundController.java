@@ -1,5 +1,6 @@
 package com.example.train_back.controller;
 
+import com.example.train_back.dto.FundFilterRequest;
 import com.example.train_back.entity.Fund;
 import com.example.train_back.service.FundService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +27,32 @@ public class FundController {
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>> getFunds(
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String fundType,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String operationCycle,
+            @RequestParam(required = false) Double minFundSize,
+            @RequestParam(required = false) Double maxFundSize,
+            @RequestParam(required = false) Double minFeeRate,
+            @RequestParam(required = false) Double maxFeeRate) {
         Map<String, Object> response = new HashMap<>();
         try {
+            FundFilterRequest filterRequest = new FundFilterRequest();
+            filterRequest.setKeyword(normalize(keyword));
+            filterRequest.setFundType(normalize(fundType));
+            filterRequest.setCategory(normalize(category));
+            filterRequest.setOperationCycle(normalize(operationCycle));
+            filterRequest.setMinFundSize(minFundSize);
+            filterRequest.setMaxFundSize(maxFundSize);
+            filterRequest.setMinFeeRate(minFeeRate);
+            filterRequest.setMaxFeeRate(maxFeeRate);
+            
             List<Fund> funds;
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                funds = fundService.searchFunds(keyword);
+            if (filterRequest.hasAdvancedFilters()) {
+                // 包含高级筛选条件（可携带关键字）
+                funds = fundService.filterFunds(filterRequest);
+            } else if (filterRequest.getKeyword() != null) {
+                funds = fundService.searchFunds(filterRequest.getKeyword());
             } else {
                 funds = fundService.getAllFunds();
             }
@@ -46,6 +67,14 @@ public class FundController {
             response.put("data", null);
             return ResponseEntity.status(500).body(response);
         }
+    }
+
+    private String normalize(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
     
     /**

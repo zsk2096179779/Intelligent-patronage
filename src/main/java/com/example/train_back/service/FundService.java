@@ -1,5 +1,6 @@
 package com.example.train_back.service;
 
+import com.example.train_back.dto.FundFilterRequest;
 import com.example.train_back.entity.Fund;
 
 import java.util.List;
@@ -42,5 +43,12 @@ public interface FundService {
      * @return 是否存在
      */
     boolean validateFundCode(String fundCode);
+
+    /**
+     * 按条件筛选基金
+     * @param filterRequest 筛选条件
+     * @return 基金列表
+     */
+    List<Fund> filterFunds(FundFilterRequest filterRequest);
 }
 

@@ -1,5 +1,6 @@
 package com.example.train_back.mapper;
 
+import com.example.train_back.dto.FundFilterRequest;
 import com.example.train_back.entity.Fund;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -38,5 +39,12 @@ public interface FundMapper {
      * @return 基金列表
      */
     List<Fund> searchFunds(@Param("keyword") String keyword);
+
+    /**
+     * 按条件筛选基金
+     * @param filterRequest 筛选条件
+     * @return 基金列表
+     */
+    List<Fund> filterFunds(FundFilterRequest filterRequest);
 }
 
