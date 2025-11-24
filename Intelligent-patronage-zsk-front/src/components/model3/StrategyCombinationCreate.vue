@@ -405,7 +405,66 @@
     </div>
 
     <!-- 添加基金对话框 -->
-    <el-dialog v-model="addFundDialogVisible" title="添加基金" width="600px" @open="handleDialogOpen">
+    <el-dialog v-model="addFundDialogVisible" title="添加基金" width="620px" @open="handleDialogOpen">
+      <div class="fund-filter-panel">
+        <div class="panel-header">
+          <span class="panel-title">基金筛选</span>
+          <div class="panel-actions">
+            <el-button size="small" @click="resetFundFilter">重置</el-button>
+            <el-button size="small" type="primary" @click="applyFundFilter" :loading="fundsLoading">筛选</el-button>
+          </div>
+        </div>
+        <el-form :model="fundFilterForm" label-width="80px" class="fund-filter-form" size="small">
+          <el-row :gutter="12">
+            <el-col :xs="24" :sm="12">
+              <el-form-item label="关键字">
+                <el-input v-model="fundFilterForm.keyword" placeholder="基金代码/名称" clearable />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :sm="12">
+              <el-form-item label="基金类型">
+                <el-input v-model="fundFilterForm.fundType" placeholder="如 股票型、混合型" clearable />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :sm="12">
+              <el-form-item label="分类">
+                <el-input v-model="fundFilterForm.category" placeholder="如 权益类、货币类" clearable />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :sm="12">
+              <el-form-item label="运作周期">
+                <el-input v-model="fundFilterForm.operationCycle" placeholder="如 开放式、封闭式" clearable />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :sm="12">
+              <el-form-item label="规模下限">
+                <el-input-number
+                  v-model="fundFilterForm.minFundSize"
+                  :min="0"
+                  :precision="2"
+                  :step="10"
+                  controls-position="right"
+                  placeholder="单位：亿元"
+                  class="fund-filter-number"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :xs="24" :sm="12">
+              <el-form-item label="规模上限">
+                <el-input-number
+                  v-model="fundFilterForm.maxFundSize"
+                  :min="0"
+                  :precision="2"
+                  :step="10"
+                  controls-position="right"
+                  placeholder="单位：亿元"
+                  class="fund-filter-number"
+                />
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
       <el-form :model="newFund" label-width="100px">
         <el-form-item label="选择基金" required>
           <el-select
@@ -550,6 +609,24 @@ const strategiesLoading = ref(false)
 const fundsList = ref<Fund[]>([])
 const fundsLoading = ref(false)
 const fundsSearchKeyword = ref('')
+
+interface FundFilterParams {
+  keyword?: string
+  fundType?: string
+  category?: string
+  operationCycle?: string
+  minFundSize?: number | null
+  maxFundSize?: number | null
+}
+
+const fundFilterForm = reactive<FundFilterParams>({
+  keyword: '',
+  fundType: '',
+  category: '',
+  operationCycle: '',
+  minFundSize: null,
+  maxFundSize: null
+})
 
 // 表单引用
 const step1FormRef = ref<FormInstance>()
@@ -1234,11 +1311,34 @@ const normalizeFund = (item: any): Fund | null => {
   }
 }
 
-const fetchFunds = async (keyword?: string) => {
+const buildFundQueryParams = (filters: FundFilterParams = {}) => {
+  const params: Record<string, string | number> = {}
+
+  const addParam = (key: keyof FundFilterParams, value: any) => {
+    if (value === null || value === undefined) return
+    if (typeof value === 'string') {
+      const trimmed = value.trim()
+      if (trimmed) params[key] = trimmed
+    } else if (!Number.isNaN(value)) {
+      params[key] = value
+    }
+  }
+
+  addParam('keyword', filters.keyword)
+  addParam('fundType', filters.fundType)
+  addParam('category', filters.category)
+  addParam('operationCycle', filters.operationCycle)
+  addParam('minFundSize', filters.minFundSize)
+  addParam('maxFundSize', filters.maxFundSize)
+
+  return params
+}
+
+const fetchFunds = async (filters: FundFilterParams = {}) => {
   fundsLoading.value = true
   try {
     const url = getApiUrl(API_CONFIG.ENDPOINTS.FUNDS_LIST)
-    const params = keyword ? { keyword } : {}
+    const params = buildFundQueryParams(filters)
     
     const response = await axios.get(url, { params })
 
@@ -1271,11 +1371,8 @@ const fetchFunds = async (keyword?: string) => {
 // 搜索基金（远程搜索）
 const searchFunds = (keyword: string) => {
   fundsSearchKeyword.value = keyword
-  if (keyword) {
-    fetchFunds(keyword)
-  } else {
-    fetchFunds()
-  }
+  fundFilterForm.keyword = keyword
+  fetchFunds({ ...fundFilterForm, keyword })
 }
 
 // 根据基金代码获取基金详情
@@ -1314,8 +1411,23 @@ const showAddFundDialog = () => {
 const handleDialogOpen = () => {
   // 对话框打开时加载基金列表
   if (fundsList.value.length === 0) {
-    fetchFunds()
+    fetchFunds(fundFilterForm)
   }
+}
+
+const applyFundFilter = () => {
+  fetchFunds({ ...fundFilterForm })
+}
+
+const resetFundFilter = () => {
+  fundFilterForm.keyword = ''
+  fundFilterForm.fundType = ''
+  fundFilterForm.category = ''
+  fundFilterForm.operationCycle = ''
+  fundFilterForm.minFundSize = null
+  fundFilterForm.maxFundSize = null
+  fundsSearchKeyword.value = ''
+  fetchFunds()
 }
 
 const handleFundCodeChange = async (fundCode: string) => {
@@ -1535,6 +1647,40 @@ onMounted(() => {
 
 .step-panel {
   padding: 24px;
+}
+
+.fund-filter-panel {
+  background: #f5f7fa;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.fund-filter-form :deep(.el-form-item) {
+  margin-bottom: 12px;
+}
+
+.fund-filter-number {
+  width: 100%;
 }
 
 .step-title {
