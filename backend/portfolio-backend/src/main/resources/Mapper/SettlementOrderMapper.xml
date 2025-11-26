@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.train_back.mapper.SettlementOrderMapper">
+
+    <resultMap id="SettlementOrderMap"
+               type="com.example.train_back.entity.SettlementOrder">
+        <id     property="id"            column="id"/>
+        <result property="batchNo"       column="batch_no"/>
+        <result property="portfolioName" column="portfolio_name"/>
+        <result property="portfolioId"   column="portfolio_id"/>
+        <result property="fundName"      column="fund_name"/>
+        <result property="fundCode"      column="fund_code"/>
+        <result property="ratio"         column="ratio"/>
+    </resultMap>
+
+    <insert id="insert"
+            parameterType="com.example.train_back.entity.SettlementOrder"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO settlement_orders (
+            batch_no,
+            portfolio_name,
+            portfolio_id,
+            fund_name,
+            fund_code,
+            ratio
+        ) VALUES (
+                     #{batchNo},
+                     #{portfolioName},
+                     #{portfolioId},
+                     #{fundName},
+                     #{fundCode},
+                     #{ratio}
+                 )
+    </insert>
+
+    <insert id="insertBatch">
+        INSERT INTO settlement_orders (
+        batch_no,
+        portfolio_name,
+        portfolio_id,
+        fund_name,
+        fund_code,
+        ratio
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.batchNo},
+            #{item.portfolioName},
+            #{item.portfolioId},
+            #{item.fundName},
+            #{item.fundCode},
+            #{item.ratio}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectById"
+            parameterType="int"
+            resultMap="SettlementOrderMap">
+        SELECT
+            id, batch_no, portfolio_name, portfolio_id,
+            fund_name, fund_code, ratio
+        FROM settlement_orders
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByPortfolioId"
+            parameterType="int"
+            resultMap="SettlementOrderMap">
+        SELECT
+            id, batch_no, portfolio_name, portfolio_id,
+            fund_name, fund_code, ratio
+        FROM settlement_orders
+        WHERE portfolio_id = #{portfolioId}
+        ORDER BY batch_no, id
+    </select>
+
+    <select id="selectByBatchNo"
+            parameterType="string"
+            resultMap="SettlementOrderMap">
+        SELECT
+            id, batch_no, portfolio_name, portfolio_id,
+            fund_name, fund_code, ratio
+        FROM settlement_orders
+        WHERE batch_no = #{batchNo}
+        ORDER BY id
+    </select>
+
+</mapper>

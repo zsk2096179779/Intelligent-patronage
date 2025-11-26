@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.StrategyMonitorMetricsMapper">
+
+    <resultMap id="StrategyMonitorMetricsMap" type="com.example.backend.entity.StrategyMonitorMetrics">
+        <id column="strategy_id" property="strategyId"/>
+        <result column="status" property="systemStatus"/>
+        <result column="risk_level" property="riskLevel"/>
+        <result column="rebalance_period" property="rebalancePeriod"/>
+        <result column="updated_at" property="monitorUpdatedAt"/>
+    </resultMap>
+
+    <select id="findByStrategyId" parameterType="long" resultMap="StrategyMonitorMetricsMap">
+        SELECT 
+            s.id as strategy_id,
+            s.status,
+            s.risk_level,
+            COALESCE(sc.rebalance_period, 'monthly') as rebalance_period,
+            s.updated_at
+        FROM strategy s
+        LEFT JOIN strategy_config sc ON sc.strategy_id = s.id
+        WHERE s.id = #{strategyId}
+    </select>
+</mapper>
+

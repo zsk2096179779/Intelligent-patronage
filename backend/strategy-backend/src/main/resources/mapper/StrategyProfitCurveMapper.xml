@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.StrategyProfitCurveMapper">
+
+    <resultMap id="StrategyProfitCurvePointMap" type="com.example.backend.entity.StrategyProfitCurvePoint">
+        <id column="id" property="id"/>
+        <result column="strategy_id" property="strategyId"/>
+        <result column="point_date" property="pointDate"/>
+        <result column="net_value" property="netValue"/>
+    </resultMap>
+
+    <select id="findByStrategyId" parameterType="long" resultMap="StrategyProfitCurvePointMap">
+        SELECT id, strategy_id, point_date, net_value
+        FROM strategy_profit_curve
+        WHERE strategy_id = #{strategyId}
+        ORDER BY point_date
+    </select>
+</mapper>
+

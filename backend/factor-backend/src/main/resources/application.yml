@@ -1,0 +1,29 @@
+# 8080
+server:
+    port: 8080
+
+spring:
+    application:
+        name: fund-advisor
+    datasource:
+        url: jdbc:mysql://116.62.82.244:3306/wealthadvisor?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+        username: remote_admin
+        password: 123456
+
+# MyBatis配置
+mybatis:
+    # mapper.xml文件位置
+    mapper-locations: classpath:mapper/**/*.xml
+    # 实体类包路径
+    type-aliases-package: com.fengqi.fund.fundadvisor.entity
+    configuration:
+        # 开启驼峰命名转换
+        map-underscore-to-camel-case: true
+        # 打印SQL语句
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志配置
+logging:
+    level:
+        com.fengqi.fund.fundadvisor.mapper: DEBUG
+        org.springframework.web: DEBUG

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.FactorBaseMapper">
+
+    <resultMap id="factorBaseResultMap" type="com.example.backend.entity.FactorBase">
+        <id column="base_id" property="baseId"/>
+        <result column="factor_name" property="factorName"/>
+        <result column="factor_code" property="factorCode"/>
+        <result column="factor_formula" property="factorFormula"/>
+        <result column="data_source" property="dataSource"/>
+        <result column="update_frequency" property="updateFrequency"/>
+        <result column="data_start_date" property="dataStartDate"/>
+        <result column="latest_data_date" property="latestDataDate"/>
+        <result column="data_desc" property="dataDesc"/>
+        <result column="is_valid" property="isValid"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="findAllValid" resultMap="factorBaseResultMap">
+        SELECT base_id, factor_name, factor_code, factor_formula, data_source,
+               update_frequency, data_start_date, latest_data_date, data_desc,
+               is_valid, create_time
+        FROM factor_base
+        WHERE is_valid = 1
+        ORDER BY base_id ASC
+    </select>
+
+    <select id="findById" parameterType="int" resultMap="factorBaseResultMap">
+        SELECT base_id, factor_name, factor_code, factor_formula, data_source,
+               update_frequency, data_start_date, latest_data_date, data_desc,
+               is_valid, create_time
+        FROM factor_base
+        WHERE base_id = #{baseId}
+    </select>
+
+    <select id="findByCode" parameterType="string" resultMap="factorBaseResultMap">
+        SELECT base_id, factor_name, factor_code, factor_formula, data_source,
+               update_frequency, data_start_date, latest_data_date, data_desc,
+               is_valid, create_time
+        FROM factor_base
+        WHERE factor_code = #{factorCode}
+    </select>
+</mapper>
+

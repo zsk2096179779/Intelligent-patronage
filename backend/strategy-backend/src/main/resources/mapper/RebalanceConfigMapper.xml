@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.RebalanceConfigMapper">
+
+    <resultMap id="RebalanceConfigMap" type="com.example.backend.entity.RebalanceConfig">
+        <id column="strategy_id" property="strategyId"/>
+        <result column="active_rebalancing" property="activeRebalancing"/>
+        <result column="trigger_by_threshold" property="triggerByThreshold"/>
+        <result column="trigger_by_periodic" property="triggerByPeriodic"/>
+        <result column="frequency" property="frequency"/>
+        <result column="execution_time" property="executionTime"/>
+        <result column="max_adjustment_rate" property="maxAdjustmentRate"/>
+        <result column="stock_deviation" property="stockDeviation"/>
+        <result column="bond_deviation" property="bondDeviation"/>
+        <result column="commodity_deviation" property="commodityDeviation"/>
+        <result column="cash_deviation" property="cashDeviation"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="findByStrategyId" parameterType="long" resultMap="RebalanceConfigMap">
+        SELECT strategy_id, active_rebalancing, trigger_by_threshold, trigger_by_periodic,
+               frequency, execution_time, max_adjustment_rate, stock_deviation, bond_deviation,
+               commodity_deviation, cash_deviation, update_time
+        FROM strategy_rebalance_config
+        WHERE strategy_id = #{strategyId}
+    </select>
+
+    <insert id="upsert" parameterType="com.example.backend.entity.RebalanceConfig">
+        INSERT INTO strategy_rebalance_config
+        (strategy_id, active_rebalancing, trigger_by_threshold, trigger_by_periodic,
+         frequency, execution_time, max_adjustment_rate, stock_deviation, bond_deviation,
+         commodity_deviation, cash_deviation, update_time)
+        VALUES
+        (#{strategyId}, #{activeRebalancing}, #{triggerByThreshold}, #{triggerByPeriodic},
+         #{frequency}, #{executionTime}, #{maxAdjustmentRate}, #{stockDeviation}, #{bondDeviation},
+         #{commodityDeviation}, #{cashDeviation}, #{updateTime})
+        ON DUPLICATE KEY UPDATE
+            active_rebalancing = VALUES(active_rebalancing),
+            trigger_by_threshold = VALUES(trigger_by_threshold),
+            trigger_by_periodic = VALUES(trigger_by_periodic),
+            frequency = VALUES(frequency),
+            execution_time = VALUES(execution_time),
+            max_adjustment_rate = VALUES(max_adjustment_rate),
+            stock_deviation = VALUES(stock_deviation),
+            bond_deviation = VALUES(bond_deviation),
+            commodity_deviation = VALUES(commodity_deviation),
+            cash_deviation = VALUES(cash_deviation),
+            update_time = VALUES(update_time)
+    </insert>
+</mapper>
+

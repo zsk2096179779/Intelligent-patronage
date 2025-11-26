@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.StrategyStatisticsMapper">
+
+    <resultMap id="StrategyStatisticsMap" type="com.example.backend.entity.StrategyStatistics">
+        <id column="strategy_id" property="strategyId"/>
+        <result column="total_return" property="totalReturn"/>
+        <result column="annual_return" property="annualReturn"/>
+        <result column="max_drawdown" property="maxDrawdown"/>
+        <result column="recent30d_return" property="recent30dReturn"/>
+        <result column="recent6m_return" property="recent6mReturn"/>
+        <result column="excess_return" property="excessReturn"/>
+        <result column="sharpe_ratio" property="sharpeRatio"/>
+        <result column="volatility" property="volatility"/>
+        <result column="beta" property="beta"/>
+        <result column="information_ratio" property="informationRatio"/>
+        <result column="win_rate_count" property="winRateCount"/>
+        <result column="win_rate_percentage" property="winRatePercentage"/>
+    </resultMap>
+
+    <select id="findByStrategyId" parameterType="long" resultMap="StrategyStatisticsMap">
+        SELECT strategy_id, total_return, annual_return, max_drawdown,
+               recent30d_return, recent6m_return, excess_return,
+               sharpe_ratio, volatility, beta, information_ratio,
+               win_rate_count, win_rate_percentage
+        FROM strategy_statistics
+        WHERE strategy_id = #{strategyId}
+    </select>
+</mapper>
+

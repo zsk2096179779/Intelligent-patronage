@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.train_back.mapper.RiskAssessmentRecordMapper">
+
+    <resultMap id="RiskAssessmentRecordMap" type="com.example.train_back.entity.RiskAssessmentRecord">
+        <id     property="id"                  column="id"/>
+        <result property="userId"              column="user_id"/>
+        <result property="assessmentNo"        column="assessment_no"/>
+        <result property="questionnaireVersion" column="questionnaire_version"/>
+        <result property="answers"             column="answers"/>
+        <result property="totalScore"          column="total_score"/>
+        <result property="riskLevel"           column="risk_level"/>
+        <result property="ipAddress"           column="ip_address"/>
+        <result property="deviceInfo"          column="device_info"/>
+        <result property="startedAt"           column="started_at"/>
+        <result property="completedAt"         column="completed_at"/>
+        <result property="expireAt"            column="expire_at"/>
+        <result property="isCompleted"         column="is_completed"/>
+        <result property="isCurrent"           column="is_current"/>
+        <result property="createdAt"           column="created_at"/>
+        <result property="updatedAt"           column="updated_at"/>
+    </resultMap>
+
+    <insert id="insert"
+            parameterType="com.example.train_back.entity.RiskAssessmentRecord"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO risk_assessment_record (
+            user_id,
+            assessment_no,
+            questionnaire_version,
+            answers,
+            total_score,
+            risk_level,
+            ip_address,
+            device_info,
+            started_at,
+            completed_at,
+            expire_at,
+            is_completed,
+            is_current,
+            created_at,
+            updated_at
+        ) VALUES (
+                     #{userId},
+                     #{assessmentNo},
+                     #{questionnaireVersion},
+                     #{answers},
+                     #{totalScore},
+                     #{riskLevel},
+                     #{ipAddress},
+                     #{deviceInfo},
+                     #{startedAt},
+                     #{completedAt},
+                     #{expireAt},
+                     #{isCompleted},
+                     #{isCurrent},
+                     NOW(),
+                     NOW()
+                 )
+    </insert>
+
+    <select id="selectByAssessmentNoAndUserId"
+            resultMap="RiskAssessmentRecordMap">
+        SELECT
+            id,
+            user_id,
+            assessment_no,
+            questionnaire_version,
+            answers,
+            total_score,
+            risk_level,
+            ip_address,
+            device_info,
+            started_at,
+            completed_at,
+            expire_at,
+            is_completed,
+            is_current,
+            created_at,
+            updated_at
+        FROM risk_assessment_record
+        WHERE assessment_no = #{assessmentNo}
+          AND user_id = #{userId}
+            LIMIT 1
+    </select>
+
+    <update id="clearCurrentByUserId">
+        UPDATE risk_assessment_record
+        SET is_current = 0
+        WHERE user_id = #{userId}
+          AND is_current = 1
+    </update>
+
+    <select id="selectCurrentByUserId"
+            parameterType="int"
+            resultMap="RiskAssessmentRecordMap">
+        SELECT
+            id,
+            user_id,
+            assessment_no,
+            questionnaire_version,
+            answers,
+            total_score,
+            risk_level,
+            started_at,
+            completed_at,
+            expire_at,
+            is_completed,
+            is_current
+        FROM risk_assessment_record
+        WHERE user_id = #{userId}
+          AND is_completed = 1
+          AND is_current = 1
+        ORDER BY completed_at DESC
+            LIMIT 1
+    </select>
+
+    <update id="updateById"
+            parameterType="com.example.train_back.entity.RiskAssessmentRecord">
+        UPDATE risk_assessment_record
+        SET
+            questionnaire_version = #{questionnaireVersion},
+            answers               = #{answers},
+            total_score           = #{totalScore},
+            risk_level            = #{riskLevel},
+            ip_address            = #{ipAddress},
+            device_info           = #{deviceInfo},
+            started_at            = #{startedAt},
+            completed_at          = #{completedAt},
+            expire_at             = #{expireAt},
+            is_completed          = #{isCompleted},
+            is_current            = #{isCurrent},
+            updated_at            = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

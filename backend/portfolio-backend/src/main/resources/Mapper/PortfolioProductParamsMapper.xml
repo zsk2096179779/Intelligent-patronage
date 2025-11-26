@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.train_back.mapper.PortfolioProductParamsMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="ProductParamsResultMap" type="com.example.train_back.entity.PortfolioProductParams">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="portfolio_id" property="portfolioId" jdbcType="INTEGER"/>
+        <result column="min_invest_amount" property="minInvestAmount" jdbcType="DECIMAL"/>
+        <result column="max_invest_amount" property="maxInvestAmount" jdbcType="DECIMAL"/>
+        <result column="subscription_fee" property="subscriptionFee" jdbcType="DECIMAL"/>
+        <result column="redemption_fee" property="redemptionFee" jdbcType="DECIMAL"/>
+        <result column="management_fee" property="managementFee" jdbcType="DECIMAL"/>
+        <result column="open_day_rule" property="openDayRule" jdbcType="VARCHAR"/>
+        <result column="redemption_rule" property="redemptionRule" jdbcType="VARCHAR"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 插入或更新产品参数 -->
+    <insert id="insertOrUpdate" parameterType="com.example.train_back.entity.PortfolioProductParams">
+        INSERT INTO portfolio_product_params (
+            portfolio_id, min_invest_amount, max_invest_amount,
+            subscription_fee, redemption_fee, management_fee,
+            open_day_rule, redemption_rule, created_at, updated_at
+        ) VALUES (
+            #{portfolioId}, #{minInvestAmount}, #{maxInvestAmount},
+            #{subscriptionFee}, #{redemptionFee}, #{managementFee},
+            #{openDayRule}, #{redemptionRule}, NOW(), NOW()
+        )
+        ON DUPLICATE KEY UPDATE
+            min_invest_amount = VALUES(min_invest_amount),
+            max_invest_amount = VALUES(max_invest_amount),
+            subscription_fee = VALUES(subscription_fee),
+            redemption_fee = VALUES(redemption_fee),
+            management_fee = VALUES(management_fee),
+            open_day_rule = VALUES(open_day_rule),
+            redemption_rule = VALUES(redemption_rule),
+            updated_at = NOW()
+    </insert>
+
+    <!-- 根据组合ID查询产品参数 -->
+    <select id="selectByPortfolioId" resultMap="ProductParamsResultMap">
+        SELECT * FROM portfolio_product_params
+        WHERE portfolio_id = #{portfolioId}
+    </select>
+
+    <!-- 删除产品参数 -->
+    <delete id="deleteByPortfolioId">
+        DELETE FROM portfolio_product_params
+        WHERE portfolio_id = #{portfolioId}
+    </delete>
+
+</mapper>
+

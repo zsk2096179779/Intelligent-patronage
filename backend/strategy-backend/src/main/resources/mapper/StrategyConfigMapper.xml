@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.StrategyConfigMapper">
+
+    <resultMap id="strategyConfigResultMap" type="com.example.backend.entity.StrategyConfig">
+        <id column="id" property="id"/>
+        <result column="strategy_id" property="strategyId"/>
+        <result column="rebalance_period" property="rebalancePeriod"/>
+        <result column="max_rebalance_ratio" property="maxRebalanceRatio"/>
+        <result column="is_active_rebalance" property="isActiveRebalance"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.example.backend.entity.StrategyConfig" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO strategy_config
+        (strategy_id, rebalance_period, max_rebalance_ratio, is_active_rebalance, created_at, updated_at)
+        VALUES
+        (#{strategyId}, #{rebalancePeriod}, #{maxRebalanceRatio}, #{isActiveRebalance}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <select id="findByStrategyId" parameterType="long" resultMap="strategyConfigResultMap">
+        SELECT id, strategy_id, rebalance_period, max_rebalance_ratio, is_active_rebalance, created_at, updated_at
+        FROM strategy_config
+        WHERE strategy_id = #{strategyId}
+    </select>
+
+    <update id="update" parameterType="com.example.backend.entity.StrategyConfig">
+        UPDATE strategy_config
+        SET rebalance_period = #{rebalancePeriod},
+            max_rebalance_ratio = #{maxRebalanceRatio},
+            is_active_rebalance = #{isActiveRebalance},
+            updated_at = NOW()
+        WHERE strategy_id = #{strategyId}
+    </update>
+
+    <delete id="deleteByStrategyId" parameterType="long">
+        DELETE FROM strategy_config WHERE strategy_id = #{strategyId}
+    </delete>
+</mapper>
+

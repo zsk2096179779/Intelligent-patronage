@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.StrategyMapper">
+
+    <resultMap id="strategyResultMap" type="com.example.backend.entity.Strategy">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="description" property="description"/>
+        <result column="risk_level" property="riskLevel"/>
+        <result column="status" property="status"/>
+        <result column="owner" property="owner"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.example.backend.entity.Strategy" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO strategy
+        (name, type, description, risk_level, status, owner, created_at, updated_at)
+        VALUES
+        (#{name}, #{type}, #{description}, #{riskLevel}, #{status}, #{owner}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <select id="findAll" resultMap="strategyResultMap">
+        SELECT id, name, type, description, risk_level, status, owner, created_at, updated_at
+        FROM strategy
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findByOwner" parameterType="long" resultMap="strategyResultMap">
+        SELECT id, name, type, description, risk_level, status, owner, created_at, updated_at
+        FROM strategy
+        WHERE owner = #{owner}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findById" parameterType="long" resultMap="strategyResultMap">
+        SELECT id, name, type, description, risk_level, status, owner, created_at, updated_at
+        FROM strategy
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE strategy
+        SET status = #{status}, updated_at = NOW()
+        WHERE id = #{id} AND owner = #{owner}
+    </update>
+
+    <update id="update" parameterType="com.example.backend.entity.Strategy">
+        UPDATE strategy
+        SET name = #{name},
+            type = #{type},
+            description = #{description},
+            risk_level = #{riskLevel},
+            status = #{status},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM strategy WHERE id = #{id} AND owner = #{owner}
+    </delete>
+</mapper>
+

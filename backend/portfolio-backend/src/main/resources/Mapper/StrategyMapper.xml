@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.train_back.mapper.StrategyMapper">
+
+    <!-- 策略列表结果映射 -->
+    <resultMap id="StrategyListResultMap" type="com.example.train_back.dto.StrategyListDTO">
+        <id column="strategy_id" property="strategyId" jdbcType="INTEGER"/>
+        <result column="strategy_name" property="strategyName" jdbcType="VARCHAR"/>
+        <result column="strategy_type" property="strategyType" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="strategy_ref_id" property="strategyRefId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 查询所有策略列表 -->
+    <select id="selectAllStrategies" resultMap="StrategyListResultMap">
+        SELECT
+            strategyid AS strategy_id,
+            name AS strategy_name,
+            strategy_type,
+            description,
+            strategy_ref_id
+        FROM strategies
+        ORDER BY strategyid DESC
+    </select>
+
+</mapper>
+

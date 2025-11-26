@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.StrategyWarningMapper">
+
+    <resultMap id="StrategyWarningMap" type="com.example.backend.entity.StrategyWarning">
+        <id column="id" property="id"/>
+        <result column="strategy_id" property="strategyId"/>
+        <result column="title" property="title"/>
+        <result column="event_time" property="eventTime"/>
+        <result column="description" property="description"/>
+        <result column="risk_level" property="riskLevel"/>
+        <result column="resolved" property="resolved"/>
+    </resultMap>
+
+    <select id="findByStrategyId" parameterType="long" resultMap="StrategyWarningMap">
+        SELECT id, strategy_id, title, event_time, description, risk_level, resolved
+        FROM strategy_warning
+        WHERE strategy_id = #{strategyId}
+        ORDER BY event_time DESC
+    </select>
+
+    <insert id="insert" parameterType="com.example.backend.entity.StrategyWarning" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO strategy_warning (strategy_id, title, description, event_time, risk_level, resolved, created_at, updated_at)
+        VALUES (#{strategyId}, #{title}, #{description}, #{eventTime}, #{riskLevel}, #{resolved}, NOW(), NOW())
+    </insert>
+
+    <insert id="insertBatch" parameterType="list">
+        INSERT INTO strategy_warning (strategy_id, title, description, event_time, risk_level, resolved, created_at, updated_at)
+        VALUES
+        <foreach collection="warnings" item="warning" separator=",">
+            (#{warning.strategyId}, #{warning.title}, #{warning.description}, #{warning.eventTime}, #{warning.riskLevel}, #{warning.resolved}, NOW(), NOW())
+        </foreach>
+    </insert>
+
+    <delete id="deleteByStrategyId" parameterType="long">
+        DELETE FROM strategy_warning WHERE strategy_id = #{strategyId}
+    </delete>
+</mapper>
+

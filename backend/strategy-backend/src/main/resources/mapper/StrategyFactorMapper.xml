@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.StrategyFactorMapper">
+
+    <resultMap id="strategyFactorResultMap" type="com.example.backend.entity.StrategyFactor">
+        <id column="id" property="id"/>
+        <result column="strategy_id" property="strategyId"/>
+        <result column="factor_name" property="factorName"/>
+        <result column="weight" property="weight"/>
+        <result column="frequency" property="frequency"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.example.backend.entity.StrategyFactor" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO strategy_factor
+        (strategy_id, factor_name, weight, frequency, created_at, updated_at)
+        VALUES
+        (#{strategyId}, #{factorName}, #{weight}, #{frequency}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <select id="findByStrategyId" parameterType="long" resultMap="strategyFactorResultMap">
+        SELECT id, strategy_id, factor_name, weight, frequency, created_at, updated_at
+        FROM strategy_factor
+        WHERE strategy_id = #{strategyId}
+        ORDER BY created_at ASC
+    </select>
+
+    <update id="update" parameterType="com.example.backend.entity.StrategyFactor">
+        UPDATE strategy_factor
+        SET factor_name = #{factorName},
+            weight = #{weight},
+            frequency = #{frequency},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByStrategyId" parameterType="long">
+        DELETE FROM strategy_factor WHERE strategy_id = #{strategyId}
+    </delete>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM strategy_factor WHERE id = #{id}
+    </delete>
+</mapper>
+

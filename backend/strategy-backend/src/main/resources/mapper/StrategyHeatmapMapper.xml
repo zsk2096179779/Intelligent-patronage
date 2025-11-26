@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.StrategyHeatmapMapper">
+
+    <resultMap id="StrategyHeatmapMap" type="com.example.backend.entity.StrategyHeatmap">
+        <id column="id" property="id"/>
+        <result column="strategy_id" property="strategyId"/>
+        <result column="industry" property="industry"/>
+        <result column="comparison_dimension" property="comparisonDimension"/>
+        <result column="deviation_value" property="deviationValue"/>
+    </resultMap>
+
+    <select id="findByStrategyId" parameterType="long" resultMap="StrategyHeatmapMap">
+        SELECT id, strategy_id, industry, comparison_dimension, deviation_value
+        FROM strategy_heatmap
+        WHERE strategy_id = #{strategyId}
+        ORDER BY industry, comparison_dimension
+    </select>
+</mapper>
+

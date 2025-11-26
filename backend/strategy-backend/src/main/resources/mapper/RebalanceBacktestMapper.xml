@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.RebalanceBacktestMapper">
+
+    <resultMap id="RebalanceBacktestResultMap" type="com.example.backend.entity.RebalanceBacktestResult">
+        <id column="id" property="id"/>
+        <result column="strategy_id" property="strategyId"/>
+        <result column="cumulative_return" property="cumulativeReturn"/>
+        <result column="max_drawdown" property="maxDrawdown"/>
+        <result column="sharpe_ratio" property="sharpeRatio"/>
+        <result column="trades" property="trades"/>
+        <result column="run_at" property="runAt"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.example.backend.entity.RebalanceBacktestResult" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO strategy_rebalance_backtest
+        (strategy_id, cumulative_return, max_drawdown, sharpe_ratio, trades, run_at)
+        VALUES
+        (#{strategyId}, #{cumulativeReturn}, #{maxDrawdown}, #{sharpeRatio}, #{trades}, #{runAt})
+    </insert>
+
+    <select id="findLatestByStrategyId" parameterType="long" resultMap="RebalanceBacktestResultMap">
+        SELECT id, strategy_id, cumulative_return, max_drawdown, sharpe_ratio, trades, run_at
+        FROM strategy_rebalance_backtest
+        WHERE strategy_id = #{strategyId}
+        ORDER BY run_at DESC
+        LIMIT 1
+    </select>
+</mapper>
+

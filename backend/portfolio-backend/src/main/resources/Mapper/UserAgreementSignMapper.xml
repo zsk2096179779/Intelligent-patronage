@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.train_back.mapper.UserAgreementSignMapper">
+
+    <resultMap id="UserAgreementSignMap" type="com.example.train_back.entity.UserAgreementSign">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="agreementId" column="agreement_id"/>
+        <result property="agreementCode" column="agreement_code"/>
+        <result property="agreementVersion" column="agreement_version"/>
+        <result property="signNo" column="sign_no"/>
+        <result property="signStatus" column="sign_status"/>
+        <result property="signScenario" column="sign_scenario"/>
+        <result property="relatedOrderNo" column="related_order_no"/>
+        <result property="ipAddress" column="ip_address"/>
+        <result property="deviceInfo" column="device_info"/>
+        <result property="signedAt" column="signed_at"/>
+        <result property="contentHash" column="content_hash"/>
+        <result property="signatureData" column="signature_data"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.example.train_back.entity.UserAgreementSign"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_agreement_sign (
+            user_id,
+            agreement_id,
+            agreement_code,
+            agreement_version,
+            sign_no,
+            sign_status,
+            sign_scenario,
+            related_order_no,
+            ip_address,
+            device_info,
+            signed_at,
+            content_hash,
+            signature_data,
+            created_at,
+            updated_at
+        ) VALUES (
+                     #{userId},
+                     #{agreementId},
+                     #{agreementCode},
+                     #{agreementVersion},
+                     #{signNo},
+                     #{signStatus},
+                     #{signScenario},
+                     #{relatedOrderNo},
+                     #{ipAddress},
+                     #{deviceInfo},
+                     #{signedAt},
+                     #{contentHash},
+                     #{signatureData},
+                     NOW(),
+                     NOW()
+                 )
+    </insert>
+
+    <select id="selectLatestByUserAndAgreement"
+            resultMap="UserAgreementSignMap">
+        SELECT
+            id, user_id, agreement_id, agreement_code, agreement_version,
+            sign_no, sign_status, sign_scenario, related_order_no,
+            ip_address, device_info, signed_at,
+            content_hash, signature_data,
+            created_at, updated_at
+        FROM user_agreement_sign
+        WHERE user_id = #{userId}
+          AND agreement_id = #{agreementId}
+          AND sign_scenario = #{scenario}
+          AND sign_status = 1
+        ORDER BY signed_at DESC
+            LIMIT 1
+    </select>
+
+    <select id="selectByUserAndScenario" resultMap="UserAgreementSignMap">
+        SELECT
+            id, user_id, agreement_id, agreement_code, agreement_version,
+            sign_no, sign_status, sign_scenario, related_order_no,
+            ip_address, device_info, signed_at,
+            content_hash, signature_data,
+            created_at, updated_at
+        FROM user_agreement_sign
+        WHERE user_id = #{userId}
+          AND sign_scenario = #{scenario}
+          AND sign_status = 1
+        ORDER BY signed_at DESC
+    </select>
+
+</mapper>

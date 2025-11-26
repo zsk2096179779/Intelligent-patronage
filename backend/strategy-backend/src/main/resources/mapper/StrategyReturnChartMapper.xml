@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.StrategyReturnChartMapper">
+
+    <resultMap id="StrategyReturnPointMap" type="com.example.backend.entity.StrategyReturnPoint">
+        <id column="id" property="id"/>
+        <result column="strategy_id" property="strategyId"/>
+        <result column="date" property="date"/>
+        <result column="strategy_return" property="strategyReturn"/>
+        <result column="benchmark_return" property="benchmarkReturn"/>
+    </resultMap>
+
+    <select id="findByStrategyId" parameterType="long" resultMap="StrategyReturnPointMap">
+        SELECT id, strategy_id, date, strategy_return, benchmark_return
+        FROM strategy_return_chart
+        WHERE strategy_id = #{strategyId}
+        ORDER BY date
+    </select>
+</mapper>
+

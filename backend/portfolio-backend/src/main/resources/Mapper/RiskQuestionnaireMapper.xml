@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.train_back.mapper.RiskQuestionnaireMapper">
+
+    <resultMap id="RiskQuestionnaireMap" type="com.example.train_back.entity.RiskQuestionnaire">
+        <id     property="id"            column="id"/>
+        <result property="questionCode"  column="question_code"/>
+        <result property="questionText"  column="question_text"/>
+        <result property="questionType"  column="question_type"/>
+        <result property="options"       column="options"/>
+        <result property="category"      column="category"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="RiskQuestionnaireMap">
+        SELECT
+            id,
+            question_code,
+            question_text,
+            question_type,
+            options,
+            category
+        FROM risk_questionnaire
+        ORDER BY id ASC
+    </select>
+
+</mapper>

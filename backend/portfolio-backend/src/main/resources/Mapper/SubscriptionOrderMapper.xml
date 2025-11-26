@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.train_back.mapper.SubscriptionOrderMapper">
+
+    <!-- ==== 实体映射 ==== -->
+    <resultMap id="SubscriptionOrderMap"
+               type="com.example.train_back.entity.SubscriptionOrder">
+        <id     property="id"                   column="id"/>
+        <result property="orderNo"              column="order_no"/>
+        <result property="userId"               column="user_id"/>
+        <result property="portfolioId"          column="portfolio_id"/>
+        <result property="portfolioName"        column="portfolio_name"/>
+
+        <result property="subscriptionAmount"   column="subscription_amount"/>
+        <result property="actualAmount"         column="actual_amount"/>
+        <result property="feeAmount"            column="fee_amount"/>
+
+        <result property="dividendMode"         column="dividend_mode"/>
+        <result property="autoInvestEnabled"    column="auto_invest_enabled"/>
+        <result property="autoInvestPeriod"     column="auto_invest_period"/>
+        <result property="autoInvestAmount"     column="auto_invest_amount"/>
+
+        <result property="userRiskLevel"        column="user_risk_level"/>
+        <result property="productRiskLevel"     column="product_risk_level"/>
+        <result property="riskMatched"          column="risk_matched"/>
+        <result property="riskMismatchConfirmed" column="risk_mismatch_confirmed"/>
+
+        <result property="agreementsSigned"     column="agreements_signed"/>
+        <result property="allAgreementsSigned"  column="all_agreements_signed"/>
+
+        <result property="signatureData"        column="signature_data"/>
+        <result property="signatureIp"          column="signature_ip"/>
+        <result property="signedAt"             column="signed_at"/>
+
+        <result property="paymentMethod"        column="payment_method"/>
+        <result property="paymentStatus"        column="payment_status"/>
+        <result property="paidAt"               column="paid_at"/>
+        <result property="paymentChannelNo"     column="payment_channel_no"/>
+
+        <result property="orderStatus"          column="order_status"/>
+        <result property="auditStatus"          column="audit_status"/>
+        <result property="auditorId"            column="auditor_id"/>
+        <result property="auditRemark"          column="audit_remark"/>
+        <result property="auditedAt"            column="audited_at"/>
+
+        <result property="submittedAt"          column="submitted_at"/>
+        <result property="completedAt"          column="completed_at"/>
+        <result property="cancelledAt"          column="cancelled_at"/>
+
+        <result property="subscribeChannel"     column="subscribe_channel"/>
+        <result property="customerRemark"       column="customer_remark"/>
+
+        <result property="createdAt"            column="created_at"/>
+        <result property="updatedAt"            column="updated_at"/>
+    </resultMap>
+
+    <!-- ==== 新增 ====
+         createOrder 里已经把大部分字段填好了，这里就按全字段插入 -->
+    <insert id="insert"
+            parameterType="com.example.train_back.entity.SubscriptionOrder"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO subscription_order (
+            order_no,
+            user_id,
+            portfolio_id,
+            portfolio_name,
+
+            subscription_amount,
+            actual_amount,
+            fee_amount,
+
+            dividend_mode,
+            auto_invest_enabled,
+            auto_invest_period,
+            auto_invest_amount,
+
+            user_risk_level,
+            product_risk_level,
+            risk_matched,
+            risk_mismatch_confirmed,
+
+            agreements_signed,
+            all_agreements_signed,
+
+            signature_data,
+            signature_ip,
+            signed_at,
+
+            payment_method,
+            payment_status,
+            paid_at,
+            payment_channel_no,
+
+            order_status,
+            audit_status,
+            auditor_id,
+            audit_remark,
+            audited_at,
+
+            submitted_at,
+            completed_at,
+            cancelled_at,
+
+            subscribe_channel,
+            customer_remark,
+            created_at,
+            updated_at
+        ) VALUES (
+                     #{orderNo},
+                     #{userId},
+                     #{portfolioId},
+                     #{portfolioName},
+
+                     #{subscriptionAmount},
+                     #{actualAmount},
+                     #{feeAmount},
+
+                     #{dividendMode},
+                     #{autoInvestEnabled},
+                     #{autoInvestPeriod},
+                     #{autoInvestAmount},
+
+                     #{userRiskLevel},
+                     #{productRiskLevel},
+                     #{riskMatched},
+                     #{riskMismatchConfirmed},
+
+                     #{agreementsSigned},
+                     #{allAgreementsSigned},
+
+                     #{signatureData},
+                     #{signatureIp},
+                     #{signedAt},
+
+                     #{paymentMethod},
+                     #{paymentStatus},
+                     #{paidAt},
+                     #{paymentChannelNo},
+
+                     #{orderStatus},
+                     #{auditStatus},
+                     #{auditorId},
+                     #{auditRemark},
+                     #{auditedAt},
+
+                     #{submittedAt},
+                     #{completedAt},
+                     #{cancelledAt},
+
+                     #{subscribeChannel},
+                     #{customerRemark},
+                     #{createdAt},
+                     #{updatedAt}
+                 )
+    </insert>
+
+    <!-- ==== 按用户 + 订单号查询一条，用在 loadOrderOrThrow ==== -->
+    <select id="selectByOrderNoAndUserId"
+            resultMap="SubscriptionOrderMap">
+        SELECT
+            id,
+            order_no       AS orderNo,
+            user_id        AS userId,
+            portfolio_id   AS portfolioId,
+            portfolio_name AS portfolioName,
+
+            subscription_amount,
+            actual_amount,
+            fee_amount,
+
+            dividend_mode,
+            auto_invest_enabled,
+            auto_invest_period,
+            auto_invest_amount,
+
+            user_risk_level,
+            product_risk_level,
+            risk_matched  AS riskMatched,
+            risk_mismatch_confirmed AS riskMismatchConfirmed,
+
+            agreements_signed,
+            all_agreements_signed,
+
+            signature_data,
+            signature_ip,
+            signed_at,
+
+            payment_method,
+            payment_status,
+            paid_at,
+            payment_channel_no,
+
+            order_status,
+            audit_status,
+            auditor_id,
+            audit_remark,
+            audited_at,
+
+            submitted_at,
+            completed_at,
+            cancelled_at,
+
+            subscribe_channel,
+            customer_remark,
+            created_at,
+            updated_at
+        FROM subscription_order
+        WHERE order_no = #{orderNo}
+          AND user_id  = #{userId}
+            LIMIT 1
+    </select>
+
+    <!-- **关键：这里要记得更新 risk_mismatch_confirmed!** -->
+    <update id="updateById"
+            parameterType="com.example.train_back.entity.SubscriptionOrder">
+        UPDATE subscription_order
+        <set>
+            <if test="orderNo != null">order_no = #{orderNo},</if>
+            <if test="portfolioId != null">portfolio_id = #{portfolioId},</if>
+            <if test="portfolioName != null">portfolio_name = #{portfolioName},</if>
+            <if test="subscriptionAmount != null">subscription_amount = #{subscriptionAmount},</if>
+            <if test="actualAmount != null">actual_amount = #{actualAmount},</if>
+            <if test="feeAmount != null">fee_amount = #{feeAmount},</if>
+            <if test="dividendMode != null">dividend_mode = #{dividendMode},</if>
+            <if test="autoInvestEnabled != null">auto_invest_enabled = #{autoInvestEnabled},</if>
+            <if test="autoInvestPeriod != null">auto_invest_period = #{autoInvestPeriod},</if>
+            <if test="autoInvestAmount != null">auto_invest_amount = #{autoInvestAmount},</if>
+            <if test="userRiskLevel != null">user_risk_level = #{userRiskLevel},</if>
+            <if test="productRiskLevel != null">product_risk_level = #{productRiskLevel},</if>
+            <if test="riskMatched != null">risk_matched = #{riskMatched},</if>
+
+            <!-- ✅ 这里一定要有 -->
+            <if test="riskMismatchConfirmed != null">
+                risk_mismatch_confirmed = #{riskMismatchConfirmed},
+            </if>
+
+            <if test="agreementsSigned != null">agreements_signed = #{agreementsSigned},</if>
+            <if test="allAgreementsSigned != null">all_agreements_signed = #{allAgreementsSigned},</if>
+            <if test="signatureData != null">signature_data = #{signatureData},</if>
+            <if test="signatureIp != null">signature_ip = #{signatureIp},</if>
+            <if test="signedAt != null">signed_at = #{signedAt},</if>
+            <if test="paymentMethod != null">payment_method = #{paymentMethod},</if>
+            <if test="paymentStatus != null">payment_status = #{paymentStatus},</if>
+            <if test="paidAt != null">paid_at = #{paidAt},</if>
+            <if test="paymentChannelNo != null">payment_channel_no = #{paymentChannelNo},</if>
+            <if test="orderStatus != null">order_status = #{orderStatus},</if>
+            <if test="auditStatus != null">audit_status = #{auditStatus},</if>
+            <if test="auditorId != null">auditor_id = #{auditorId},</if>
+            <if test="auditRemark != null">audit_remark = #{auditRemark},</if>
+            <if test="auditedAt != null">audited_at = #{auditedAt},</if>
+            <if test="submittedAt != null">submitted_at = #{submittedAt},</if>
+            <if test="completedAt != null">completed_at = #{completedAt},</if>
+            <if test="cancelledAt != null">cancelled_at = #{cancelledAt},</if>
+            <if test="subscribeChannel != null">subscribe_channel = #{subscribeChannel},</if>
+            <if test="customerRemark != null">customer_remark = #{customerRemark},</if>
+            <if test="updatedAt != null">updated_at = #{updatedAt},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- ==== 统计：我的订单数量 ====
+         status 为空或 'all' 时，不按状态过滤 -->
+    <select id="countByUserAndStatus"
+            resultType="long">
+        SELECT COUNT(1)
+        FROM subscription_order
+        WHERE user_id = #{userId}
+        <if test="status != null and status != 'all'">
+            AND order_status = #{status}
+        </if>
+    </select>
+
+    <!-- ==== 分页查询：我的订单列表 ====
+         和上面的条件保持一致，按创建时间倒序 -->
+    <select id="selectPageByUserAndStatus"
+            resultMap="SubscriptionOrderMap">
+        SELECT
+        id,
+        order_no,
+        user_id,
+        portfolio_id,
+        portfolio_name,
+
+        subscription_amount,
+        actual_amount,
+        fee_amount,
+
+        dividend_mode,
+        auto_invest_enabled,
+        auto_invest_period,
+        auto_invest_amount,
+
+        user_risk_level,
+        product_risk_level,
+        risk_matched,
+        risk_mismatch_confirmed,
+
+        agreements_signed,
+        all_agreements_signed,
+
+        signature_data,
+        signature_ip,
+        signed_at,
+
+        payment_method,
+        payment_status,
+        paid_at,
+        payment_channel_no,
+
+        order_status,
+        audit_status,
+        auditor_id,
+        audit_remark,
+        audited_at,
+
+        submitted_at,
+        completed_at,
+        cancelled_at,
+
+        subscribe_channel,
+        customer_remark,
+        created_at,
+        updated_at
+        FROM subscription_order
+        WHERE user_id = #{userId}
+        <if test="status != null and status != 'all'">
+            AND order_status = #{status}
+        </if>
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countActiveByUserAndPortfolio" resultType="int">
+        SELECT COUNT(1)
+        FROM subscription_order
+        WHERE user_id = #{userId}
+          AND portfolio_id = #{portfolioId}
+          AND (order_status IS NULL OR order_status != 'cancelled')
+    </select>
+
+</mapper>

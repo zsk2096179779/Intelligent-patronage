@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.backend.mapper.StrategyHoldingMapper">
+
+    <resultMap id="StrategyHoldingMap" type="com.example.backend.entity.StrategyHolding">
+        <id column="id" property="id"/>
+        <result column="strategy_id" property="strategyId"/>
+        <result column="stock_code" property="stockCode"/>
+        <result column="stock_name" property="stockName"/>
+        <result column="weight" property="weight"/>
+        <result column="market_value" property="marketValue"/>
+        <result column="cost" property="cost"/>
+        <result column="profit_percentage" property="profitPercentage"/>
+        <result column="holding_days" property="holdingDays"/>
+    </resultMap>
+
+    <select id="findByStrategyId" parameterType="long" resultMap="StrategyHoldingMap">
+        SELECT id, strategy_id, stock_code, stock_name, weight, market_value, cost, profit_percentage, holding_days
+        FROM strategy_holding
+        WHERE strategy_id = #{strategyId}
+        ORDER BY weight DESC
+    </select>
+</mapper>
+
