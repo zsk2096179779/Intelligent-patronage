@@ -21,6 +21,18 @@ public class SubscriptionController {
     }
 
     /**
+     * 4.5.1 创建订单草稿
+     * POST /api/subscription/create
+     */
+    @PostMapping("/create")
+    public ApiResponse<SubscriptionCreateResp> createOrder(@RequestBody SubscriptionCreateReq req,
+                                                           HttpServletRequest request) {
+        Integer userId = getCurrentUserIdOrThrow(request);
+        SubscriptionCreateResp resp = subscriptionService.createOrder(userId, req);
+        return ApiResponse.success(resp);
+    }
+
+    /**
      * 4.5.2 获取订单详情
      * GET /api/subscription/detail/{orderNo}
      */
@@ -59,7 +71,7 @@ public class SubscriptionController {
     }
 
     /**
-     * 4.5.5 创建并提交订单
+     * 4.5.5 创建并提交订单（直接提交）
      * POST /api/subscription/submit
      */
     @PostMapping("/submit")
@@ -68,6 +80,23 @@ public class SubscriptionController {
         Integer userId = getCurrentUserIdOrThrow(request);
         SubscriptionSubmitResp resp = subscriptionService.submitOrder(userId, req);
         log.info("[Subscription] submitOrder riskMismatchConfirmed={}", req.getRiskMismatchConfirmed());
+
+        return ApiResponse.success(resp);
+    }
+
+    /**
+     * 4.5.5.1 提交已存在的订单（草稿订单）
+     * POST /api/subscription/submit/{orderNo}
+     */
+    @PostMapping("/submit/{orderNo}")
+    public ApiResponse<SubscriptionSubmitResp> submitOrderByOrderNo(@PathVariable("orderNo") String orderNo,
+                                                                     @RequestBody(required = false) SubscriptionSubmitByOrderNoReq req,
+                                                                     HttpServletRequest request) {
+        Integer userId = getCurrentUserIdOrThrow(request);
+        SubscriptionSubmitResp resp = subscriptionService.submitOrderByOrderNo(userId, orderNo, req);
+        log.info("[Subscription] submitOrderByOrderNo orderNo={}, riskMismatchConfirmed={}",
+                orderNo,
+                req != null ? req.getRiskMismatchConfirmed() : null);
 
         return ApiResponse.success(resp);
     }

@@ -339,7 +339,8 @@
         FROM subscription_order
         WHERE user_id = #{userId}
           AND portfolio_id = #{portfolioId}
-          AND (order_status IS NULL OR order_status != 'cancelled')
+          AND order_status = 'completed'
+          AND audit_status = 'approved'
     </select>
 
 </mapper>

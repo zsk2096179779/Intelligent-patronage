@@ -1232,13 +1232,11 @@ const confirmAgreementsAndContinue = async () => {
 
         // 2）当前场景：订购协议
     if (agreementScenario.value === 'subscription') {
-      if (needRiskMismatchConfirm.value) {
-        // 风险匹配 → 直接进入签约表单
-        ElMessage.success('订购相关协议签署成功，请继续填写签约信息')
-        agreementDialogVisible.value = false
-        await openSubscribeDialog()
-        return
-      }
+      // 签完订购协议后，打开"首次转入"对话框让用户填写金额
+      ElMessage.success('订购相关协议签署成功，请填写转入金额')
+      agreementDialogVisible.value = false
+      subscribeVisible.value = true // 打开金额填写对话框
+      return
     }
 
     // 3）当前场景：risk_mismatch，不匹配确认协议签完 → 告诉后端已确认风险不匹配

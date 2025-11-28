@@ -35,6 +35,83 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final InvestorProfileMapper investorProfileMapper;
     private final ObjectMapper objectMapper;
 
+    // ========== 4.5.1 创建订单草稿 ==========
+
+    @Override
+    public SubscriptionCreateResp createOrder(Integer userId, SubscriptionCreateReq req) {
+        if (userId == null) {
+            throw new RuntimeException("未登录");
+        }
+        if (req == null || req.getPortfolioId() == null || req.getSubscriptionAmount() == null) {
+            throw new RuntimeException("创建订单参数不完整");
+        }
+
+        // 验证组合产品是否存在
+        StrategyCombination combo = strategyCombinationMapper.selectByIdForDeal(req.getPortfolioId());
+        if (combo == null) {
+            throw new RuntimeException("组合产品不存在");
+        }
+
+        // 计算费用
+        BigDecimal amount = req.getSubscriptionAmount();
+        BigDecimal feeRate = combo.getFeeRate() == null ? BigDecimal.ZERO : combo.getFeeRate();
+        BigDecimal fee = amount.multiply(feeRate).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal actual = amount.subtract(fee);
+
+        // 获取用户风险等级
+        InvestorProfile profile = investorProfileMapper.selectByUserId(userId);
+        String userRisk = profile != null ? profile.getRiskLevel() : null;
+        String productRisk = combo.getRiskLevel();
+        boolean riskMatched = calcRiskMatched(userRisk, productRisk);
+
+        LocalDateTime now = LocalDateTime.now();
+        SubscriptionOrder order = new SubscriptionOrder();
+        order.setOrderNo(generateOrderNo());
+        order.setUserId(userId);
+        order.setPortfolioId(combo.getId());
+        order.setPortfolioName(combo.getName());
+        order.setSubscriptionAmount(amount);
+        order.setFeeAmount(fee);
+        order.setActualAmount(actual);
+        order.setDividendMode(req.getDividendMode() != null ? req.getDividendMode() : "reinvest");
+        order.setAutoInvestEnabled(Boolean.TRUE.equals(req.getAutoInvestEnabled()) ? 1 : 0);
+        order.setAutoInvestPeriod(req.getAutoInvestPeriod());
+        order.setAutoInvestAmount(req.getAutoInvestAmount());
+        order.setUserRiskLevel(userRisk);
+        order.setProductRiskLevel(productRisk);
+        order.setRiskMatched(riskMatched ? 1 : 0);
+        order.setRiskMismatchConfirmed(0);
+        order.setAgreementsSigned(null);
+        order.setAllAgreementsSigned(0);
+        order.setSignatureData(null);
+        order.setSignatureIp(null);
+        order.setSignedAt(null);
+        order.setPaymentMethod(null);
+        order.setCustomerRemark(null);
+        order.setPaymentStatus("unpaid");
+        order.setPaidAt(null);
+        order.setPaymentChannelNo(null);
+        order.setOrderStatus("draft");  // 草稿状态
+        order.setAuditStatus("pending");
+        order.setAuditorId(null);
+        order.setAuditRemark(null);
+        order.setAuditedAt(null);
+        order.setSubmittedAt(null);
+        order.setCompletedAt(null);
+        order.setCancelledAt(null);
+        order.setSubscribeChannel("web");
+        order.setCreatedAt(now);
+        order.setUpdatedAt(now);
+
+        subscriptionOrderMapper.insert(order);
+
+        SubscriptionCreateResp resp = new SubscriptionCreateResp();
+        resp.setOrderNo(order.getOrderNo());
+        resp.setOrderStatus(order.getOrderStatus());
+        resp.setCreatedAt(order.getCreatedAt());
+        return resp;
+    }
+
     // ========== 4.5.2 订单详情 ==========
 
     @Override
@@ -238,6 +315,63 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         order.setUpdatedAt(now);
 
         subscriptionOrderMapper.insert(order);
+
+        SubscriptionSubmitResp resp = new SubscriptionSubmitResp();
+        resp.setOrderNo(order.getOrderNo());
+        resp.setOrderStatus(order.getOrderStatus());
+        resp.setAuditStatus(order.getAuditStatus());
+        resp.setSubmittedAt(order.getSubmittedAt());
+        resp.setNextStep("AUDIT");
+        resp.setEstimatedAuditTime("2个工作日内");
+        return resp;
+    }
+
+    // ========== 4.5.5.1 提交已存在的订单（草稿订单）==========
+
+    @Override
+    public SubscriptionSubmitResp submitOrderByOrderNo(Integer userId, String orderNo, SubscriptionSubmitByOrderNoReq req) {
+        if (userId == null) {
+            throw new RuntimeException("未登录");
+        }
+        if (orderNo == null || orderNo.isEmpty()) {
+            throw new RuntimeException("订单号不能为空");
+        }
+
+        // 加载订单
+        SubscriptionOrder order = loadOrderOrThrow(userId, orderNo);
+
+        // 验证订单状态（只能提交草稿状态的订单）
+        if (!"draft".equals(order.getOrderStatus())) {
+            throw new RuntimeException("订单状态不是草稿，无法提交");
+        }
+
+        // 验证风险匹配
+        boolean riskMatched = order.getRiskMatched() != null && order.getRiskMatched() == 1;
+        if (!riskMatched && req != null && !Boolean.TRUE.equals(req.getRiskMismatchConfirmed())) {
+            throw new RuntimeException("风险不匹配未确认");
+        }
+
+        // 更新订单状态
+        LocalDateTime now = LocalDateTime.now();
+        order.setOrderStatus("completed");
+        order.setAuditStatus("approved");
+        order.setSubmittedAt(now);
+        order.setCompletedAt(now);
+        order.setUpdatedAt(now);
+
+        if (req != null) {
+            if (req.getRiskMismatchConfirmed() != null) {
+                order.setRiskMismatchConfirmed(req.getRiskMismatchConfirmed() ? 1 : 0);
+            }
+            if (req.getPaymentMethod() != null) {
+                order.setPaymentMethod(req.getPaymentMethod());
+            }
+            if (req.getCustomerRemark() != null) {
+                order.setCustomerRemark(req.getCustomerRemark());
+            }
+        }
+
+        subscriptionOrderMapper.updateById(order);
 
         SubscriptionSubmitResp resp = new SubscriptionSubmitResp();
         resp.setOrderNo(order.getOrderNo());

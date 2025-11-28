@@ -4,6 +4,9 @@ import com.example.train_back.dto.subscription.*;
 
 public interface SubscriptionService {
 
+    // 4.5.1 创建订单草稿
+    SubscriptionCreateResp createOrder(Integer userId, SubscriptionCreateReq req);
+
     // 4.5.2 获取订单详情
     SubscriptionDetailVO getOrderDetail(Integer userId, String orderNo);
 
@@ -13,8 +16,11 @@ public interface SubscriptionService {
     // 4.5.4 保存电子签名
     SubscriptionSignatureResp saveSignature(Integer userId, String orderNo, SubscriptionSignatureReq req);
 
-    // 4.5.5 创建并提交订单
+    // 4.5.5 创建并提交订单（直接提交）
     SubscriptionSubmitResp submitOrder(Integer userId, SubscriptionSubmitReq req);
+
+    // 4.5.5.1 提交已存在的订单（草稿订单）
+    SubscriptionSubmitResp submitOrderByOrderNo(Integer userId, String orderNo, SubscriptionSubmitByOrderNoReq req);
 
     // 4.5.x 判断是否已购买指定组合
     boolean hasPurchasedPortfolio(Integer userId, Integer portfolioId);
